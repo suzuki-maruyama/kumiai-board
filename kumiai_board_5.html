@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>シティハウス円山北3条 組合員専用告知板</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f4f7fb;font-family:'Noto Serif JP','Yu Mincho',serif;}
+input:focus{outline:none;}
+::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const MEMBER_PIN = "2039";
+const ADMIN_PIN  = "9999";
+const TAGS = ["すべて","修繕積立金シリーズ","顧問弁護士問題シリーズ","総会・理事会","組合員の権利"];
+const CATEGORIES = ["重要","お知らせ","情報","資料"];
+const CAT_COLOR = {重要:"#b91c1c",お知らせ:"#1a3a6b",情報:"#166534",資料:"#5b21b6"};
+const F = {sans:"sans-serif",serif:"'Noto Serif JP','Yu Mincho',serif"};
+
+// ══════════════════════════════════
+// お知らせデータ（3層構造）
+// layer1: 一覧・詳細の本文（事実のみ・出典明記）
+// layer2: 詳細分析・考察（私見として明示）
+// layer3: 対話・問いかけ（読者への問い）
+// ══════════════════════════════════
+const INITIAL_NOTICES = [
+  {
+    id:1, category:"重要", categoryColor:"#b91c1c", pinned:true,
+    date:"2026年6月8日", tag:"修繕積立金シリーズ",
+    title:"修繕積立金改定の経緯と確認事項のご報告",
+    summary:"2025年度総会で可決された修繕積立金の改定（月額12,548円→27,000円）について、確認された事実と、理事会への確認事項をご報告します。",
+    layer1:"【出典】令和7年度定期総会議事録・配布資料（2025年）\n\n■ 確認された事実\n\n2025年度定期総会において、修繕積立金を月額12,548円から27,000円（約2.15倍）へ引き上げる議案が可決されました。\n\n■ 現時点で理事会への確認を求めている事項\n\n以下の事項について、2026年1月16日付にて情報開示請求書を提出しましたが、現時点で十分な回答が得られていません。\n\n① 長期修繕計画の根拠となる専門家調査報告書（開示請求中・未回答）\n② 改定額の具体的な算定根拠資料（開示請求中・未回答）\n③ 段階的引き上げ案の検討の有無（総会資料に記載なし・確認中）\n④ 国土交通省「マンション管理標準指針」との整合性（確認中）\n\n【参考法令】区分所有法第30条・第34条、標準管理規約第32条\n国土交通省「マンションの修繕積立金に関するガイドライン」（2021年改訂版）",
+    layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 理事会・顧問弁護士の回答への考察\n\n顧問弁護士から「資料が不足していても決議は無効にならない」との回答がありました。\n\n私はこの回答が、私の問いに十分答えていないと考えています。\n\n私が問うているのは「決議が無効かどうか」ではなく、「組合員が議案を適切に判断できるよう十分な情報が提供されたか」という理事会の説明責任についてです。\n\n決議の法的有効性と、理事会が組合員に対し誠実に説明する責任は、別の問題です。\n\n■ 賃貸住戸への影響について\n\n賃貸住戸を所有する組合員については、今回の改定により純利益が約23.5%減少するという具体的な影響があります。\n\nこれに対し「床面積に応じた負担だから特別の影響はない」との回答でしたが、個別の経済的影響を一般論で片付けることが適切かどうか、組合員の皆様にもご判断いただきたいと思います。\n\n■ 参考：区分所有法第31条第1項\n「規約の設定、変更又は廃止が一部の区分所有者の権利に特別の影響を及ぼすべきときは、その承諾を得なければならない。」",
+    layer3:"■ 組合員の皆様へのお問いかけ\n\n以下の点について、皆様はどのようにお考えでしょうか。\n\n① 修繕積立金を月額12,548円から27,000円へ約2.15倍に引き上げる根拠として、長期修繕計画の詳細な説明があれば、より納得して判断できたと思いますか？\n\n② 理事会が組合員に対して説明責任を十分に果たすべきと考えますか？\n\n③ 情報開示請求に対し、理事会は合理的な期間内に回答すべきだと考えますか？\n\nご意見・ご感想は203号室・鈴木章三郎までお寄せください。\n皆様のご意見が、今後の管理組合運営の改善につながると考えています。",
+    attachments:[]
+  },
+  {
+    id:2, category:"お知らせ", categoryColor:"#1a3a6b", pinned:false,
+    date:"2026年6月5日", tag:"顧問弁護士問題シリーズ",
+    title:"顧問弁護士の役割と現状についての確認事項",
+    summary:"顧問弁護士が組合員からの問い合わせに直接回答している事実をご報告し、この運用の妥当性について組合員の皆様にご確認をお願いします。",
+    layer1:"【出典】理事会からの書面回答（2025年11月・2026年2月）、顧問弁護士名義の回答書面（2026年1月・3月）\n\n■ 確認された事実\n\n・当管理組合は弁護士法人と顧問契約を締結しています。\n・203号室からの複数の問い合わせに対し、理事会ではなく顧問弁護士名義で直接回答が届いています。\n・顧問弁護士と各組合員との間には、直接の委任契約は存在しません。\n\n■ 現在確認を求めている事項（開示請求中）\n\n① 顧問弁護士との委任契約書の全文\n② 顧問費用の年間支出額および明細\n③ 顧問弁護士が関与した案件・回答の一覧\n\n【参考】標準管理規約第51条（顧問等）",
+    layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 回答主体の問題について\n\n顧問弁護士は本来「理事会の法的判断を補佐する」役割を担うものです。\n\n組合員からの問い合わせに顧問弁護士が直接回答することについて、私は以下の点が適切かどうか疑問を持っています。\n\n① 組合員と顧問弁護士の間に委任関係がないにもかかわらず、弁護士名義の書面が届くことが、組合員に心理的な圧迫感を与えないか\n\n② 顧問弁護士費用（組合費から支出）が、理事会の立場を擁護するために使われることが適切かどうか\n\n③ 本来は理事会が主体となって回答し、法的判断が必要な場合のみ弁護士の助言を得るべきではないか\n\n■ これまでの対応の経緯\n\n2025年7月以降、12通以上の投書に対し、顧問弁護士から「新たな質問はないので回答しません」という回答が繰り返されました。\n\n投書の内容は修繕積立金、総会運営、ボイラー騒音、議事録の改善など多岐にわたっており、これらを「新たな質問ではない」と一括りにすることが適切かどうか、私は疑問を持っています。",
+    layer3:"■ 組合員の皆様へのお問いかけ\n\n① 組合員の問い合わせに対し、理事会ではなく顧問弁護士が直接回答することについて、適切だとお考えですか？\n\n② 管理組合の顧問弁護士は、組合員全体の利益のために中立的な立場で助言すべきだと思いますか？\n\n③ 顧問弁護士費用（組合費から支出）の使途について、組合員への説明があるべきだとお考えですか？\n\n皆様のご意見をお聞かせください。203号室・鈴木章三郎までご連絡いただければ、次の総会での議題提起に活用させていただきます。",
+    attachments:[]
+  },
+  {
+    id:3, category:"重要", categoryColor:"#b91c1c", pinned:true,
+    date:"2026年5月28日", tag:"総会・理事会",
+    title:"令和8年度定期総会に向けてのご案内",
+    summary:"令和8年度定期総会が令和8年7月中旬に開催予定です。議決権の正しい行使方法と、今総会で確認を求めたい事項をお伝えします。",
+    layer1:"【出典】令和7年度定期総会招集通知（2025年）・管理規約第42条\n\n■ 開催概要\n\n【日時】令和8年7月中旬（詳細日時は別途招集通知にてご確認ください）\n【場所】シティハウス円山北3条 集会室\n\n■ 主な予定議題\n\n第1号議案：令和7年度収支決算報告の承認\n第2号議案：令和8年度収支予算案の承認\n第3号議案：修繕積立金改定経緯の報告\n第4号議案：管理委託契約更新の承認\n第5号議案：その他\n\n■ 議決権の正しい行使方法\n\n①【当日ご出席】議案ごとに賛否を直接表明できます。\n\n②【議決権行使書の提出】事前に各議案への賛否を書面で意思表示します。\n\n※「委任状」ではなく「議決権行使書」をお使いください。委任状では個別議案への意思が委任先に委ねられます。\n\n【参考法令】区分所有法第33条・第39条",
+    layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 過去の総会運営について私が感じた課題\n\n令和7年度総会においてAIによる発言記録の分析を行った結果、以下のような状況が見受けられました。\n\n・「時間がない」を理由に質疑が打ち切られる場面があった\n・「以前から意見がなかったから」という説明で代替された場面があった\n・組合員の質問に対し「資料がない」との回答があった\n\nこれらが事実であれば、組合員が十分な情報をもとに判断できる環境が整っていなかったと考えられます。\n\n■ 今総会で確認を求めたい事項\n\n① 修繕積立金改定の根拠資料の提示\n② 顧問弁護士委任契約の内容開示\n③ 議事録の記載方法の改善（質疑応答の詳細記録）\n④ 情報開示請求への対応状況の報告",
+    layer3:"■ 組合員の皆様へのお問いかけ\n\n① 総会の場で、組合員が十分に質疑・意見交換できる時間が確保されるべきだとお考えですか？\n\n② 議事録には、発言の要旨が記録されるべきだとお考えですか？\n\n③ 総会前に、議案の詳細な根拠資料が配布されるべきだとお考えですか？\n\n総会当日は、議決権行使書を必ずご活用ください。一票一票が管理組合の運営を変える力を持っています。\n\nご意見は203号室・鈴木章三郎までお寄せください。",
+    attachments:[]
+  },
+  {
+    id:4, category:"資料", categoryColor:"#5b21b6", pinned:false,
+    date:"2026年5月15日", tag:"組合員の権利",
+    title:"情報開示請求の方法と組合員の権利",
+    summary:"区分所有法・管理規約に基づき、組合員が行使できる情報開示請求の手順と、請求できる資料の一覧を法令出典とともにご案内します。",
+    layer1:"【出典】区分所有法・標準管理規約・国土交通省マンション管理適正化指針\n\n■ 情報請求権の根拠\n\n区分所有法第33条および標準管理規約第64条に基づき、組合員は管理組合の運営に関する書類の閲覧・写しの交付を請求する権利を有します。\n\n■ 請求できる主な資料\n\n・管理委託契約書（全文）\n・長期修繕計画書および根拠となる調査報告書\n・修繕積立金の算定根拠資料\n・理事会議事録（直近3年分）\n・定期総会議事録（直近5年分）\n・顧問弁護士との委任契約書および費用明細\n・管理費・修繕積立金の収支明細\n\n■ 請求手続きの流れ\n\n①「情報開示請求書」を書面で理事会宛に提出\n② 理事会は原則2週間以内に対応する義務があります\n③ 正当な理由のない開示拒否は管理規約違反となります\n\n請求書の書式は203号室・鈴木までお問い合わせください。\n\n【参考法令】区分所有法第33条・第34条、標準管理規約第64条",
+    layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 情報開示請求の実態について\n\n私は2026年1月16日付で複数の情報開示請求を提出しましたが、現時点で以下の資料についての十分な回答が得られていません。\n\n・長期修繕計画の根拠となる専門家調査報告書\n・修繕積立金改定の算定根拠資料\n・顧問弁護士との委任契約書\n\n理事会から「回答を準備中」との連絡はありましたが、合理的な期間を超えた対応の遅延があると考えています。\n\n■ 開示請求が重要な理由\n\n管理組合は組合員全員の共有財産を扱う組織です。その運営の透明性を確保することは、全組合員の財産を守ることに直結します。\n\n情報開示請求は組合員の正当な権利であり、これを行使することは管理組合の健全な運営に寄与します。",
+    layer3:"■ 組合員の皆様へのお問いかけ\n\n① 管理組合の収支・契約内容について、もっと情報を得たいと思ったことはありますか？\n\n② 理事会が情報開示請求に速やかに応じるべきだとお考えですか？\n\n③ 透明性の高い管理組合運営のために、何か改善してほしいことはありますか？\n\n情報開示請求書の書式提供・請求手続きのご相談など、203号室・鈴木章三郎がお手伝いします。お気軽にご連絡ください。",
+    attachments:[]
+  },
+  {
+    id:5, category:"お知らせ", categoryColor:"#1a3a6b", pinned:false,
+    date:"2026年6月1日", tag:"顧問弁護士問題シリーズ",
+    title:"理事会・顧問弁護士の回答対応の経緯（2025年6月〜9月）",
+    summary:"2025年6月から9月にかけて提出した12通以上の投書に対する回答の経緯について、事実に基づいてご報告します。",
+    layer1:"【出典】各投書の書面（2025年6月〜9月）および理事会・顧問弁護士からの回答書面\n\n■ 投書と回答の経緯（事実の記録）\n\n2025年6月30日以降、以下のテーマで理事会宛に投書を提出しました。\n\n・修繕積立金改定の根拠資料の開示要請（6/30）\n・理事会の誠実義務について（7/17）\n・総会運営の改善提案（7/19）\n・新理事会への対応方針の問い合わせ（7/29）\n・議事録の改善要請（8/11）\n・ボイラー稼働音の騒音問題（8/1）\n・民事調停の受諾要請（9/11）\nその他複数の投書\n\n■ 回答の状況\n\n上記投書のうち、6月30日付投書以外の大多数について、顧問弁護士から「新たな質問はないので回答しません」との回答がありました。\n\n6月30日付投書への回答は「資料が不足していても決議は無効にならない」「床面積に応じた負担だから特別の影響はない」「要望には応じられない」の3点でした。",
+    layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 回答対応への私の考察\n\n各投書への回答状況について、私は以下の点が問題ではないかと考えています。\n\n①「新たな質問はない」という理由での回答拒否について\nボイラー騒音（8/1）・議事録の改善（8/11）・新理事会への対応方針（7/29）など、テーマが異なる投書も同様に「新たな質問ではない」と扱われました。これが適切かどうか、皆様にもご判断いただきたいと思います。\n\n②「総会決議取消訴訟は法定されていない」という回答について\n区分所有法第57条・第59条に訴訟に関する規定があります。この回答の法的正確性については、専門家によって見解が異なる可能性があります。\n\n③ 回答拒否の決議について\n2024年12月の前期理事長回答において、「重要度・緊急度が低いと判断した投書には回答しない」という方針が示されました。この方針の妥当性についても、組合員の皆様のご判断をお願いしたいと思います。",
+    layer3:"■ 組合員の皆様へのお問いかけ\n\n① 組合員からの投書に対し、理事会は誠実に回答する義務があると思いますか？\n\n② 「重要度・緊急度が低い」という理由で投書への回答を拒否することは適切だと思いますか？\n\n③ 管理組合の運営改善のために、組合員が意見を表明できる仕組みが必要だと思いますか？\n\nこの件に関心をお持ちの方は、ぜひ203号室・鈴木章三郎までご連絡ください。",
+    attachments:[]
+  }
+];
+
+// ── ストレージ ──
+const STORE_KEY="kumiai-stats-v1";
+function loadStats(){try{const v=localStorage.getItem(STORE_KEY);return v?JSON.parse(v):{total:0,today:0,lastDate:"",byArticle:{},dailyLog:{}};}catch{return{total:0,today:0,lastDate:"",byArticle:{},dailyLog:{}};}}
+function saveStats(s){try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch{}}
+function recordLogin(){const s=loadStats();const today=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"2-digit",day:"2-digit"});s.total=(s.total||0)+1;if(s.lastDate!==today){s.today=0;s.lastDate=today;}s.today=(s.today||0)+1;s.dailyLog=s.dailyLog||{};s.dailyLog[today]=(s.dailyLog[today]||0)+1;saveStats(s);return s;}
+function recordArticle(id,title){const s=loadStats();s.byArticle=s.byArticle||{};s.byArticle[id]={title,count:((s.byArticle[id]?.count)||0)+1};saveStats(s);}
+
+// ── QRコード ──
+function QRCode({value,size=150}){
+  const cell=size/25;let h=0;
+  for(let i=0;i<value.length;i++){h=((h<<5)-h)+value.charCodeAt(i);h|=0;}h=Math.abs(h);
+  const pat=Array.from({length:25},(_,r)=>Array.from({length:25},(_,c)=>{
+    const tl=r<8&&c<8,tr=r<8&&c>=17,bl=r>=17&&c<8;
+    if(tl||tr||bl){const rr=bl?r-17:r,cc=tr?c-17:c;return(rr===0||rr===6||cc===0||cc===6||rr>=2&&rr<=4&&cc>=2&&cc<=4)?1:0;}
+    if(r===6||c===6)return(r+c)%2===0?1:0;
+    h=(h*1664525+1013904223)&0xffffffff;
+    return(Math.abs(h)+(value.charCodeAt((r*25+c)%value.length)>>(c%8)&1))%3===0?1:0;
+  }));
+  return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{display:"block"}}>
+    <rect width={size} height={size} fill="white"/>
+    {pat.map((row,r)=>row.map((v,c)=>v?<rect key={`${r}-${c}`} x={c*cell+.5} y={r*cell+.5} width={cell-1} height={cell-1} fill="#1a3a6b"/>:null))}
+  </svg>;
+}
+
+// ── アクセスカウンター ──
+function AccessCounter({stats,isAdmin}){
+  if(!stats)return null;
+  const daily=Object.entries(stats.dailyLog||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7);
+  const top=Object.entries(stats.byArticle||{}).sort((a,b)=>b[1].count-a[1].count).slice(0,4);
+  const maxD=Math.max(...daily.map(([,v])=>v),1);
+  return(
+    <div style={{background:"white",borderRadius:16,padding:20,boxShadow:"0 2px 16px rgba(0,0,0,0.08)",border:"2px solid #dce4f0",marginBottom:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+        <span style={{fontSize:20}}>📊</span>
+        <span style={{fontSize:16,fontWeight:800,color:"#1a3a6b",fontFamily:F.sans}}>組合員の関心バロメーター</span>
+      </div>
+      <div style={{display:"flex",gap:12,marginBottom:16}}>
+        <div style={{flex:1,background:"#eef3fb",borderRadius:12,padding:14,textAlign:"center",border:"2px solid #1a3a6b"}}>
+          <div style={{fontSize:11,color:"#1a3a6b",fontFamily:F.sans,fontWeight:700,marginBottom:4}}>累計アクセス</div>
+          <div style={{fontSize:40,fontWeight:800,color:"#1a3a6b",lineHeight:1,fontFamily:F.sans}}>{stats.total||0}</div>
+          <div style={{fontSize:11,color:"#888",fontFamily:F.sans,marginTop:4}}>回</div>
+        </div>
+        <div style={{flex:1,background:"#fff7e6",borderRadius:12,padding:14,textAlign:"center",border:"2px solid #d97706"}}>
+          <div style={{fontSize:11,color:"#92400e",fontFamily:F.sans,fontWeight:700,marginBottom:4}}>本日</div>
+          <div style={{fontSize:40,fontWeight:800,color:"#d97706",lineHeight:1,fontFamily:F.sans}}>{stats.today||0}</div>
+          <div style={{fontSize:11,color:"#888",fontFamily:F.sans,marginTop:4}}>回</div>
+        </div>
+      </div>
+      {daily.length>0&&<div style={{marginBottom:16}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,marginBottom:8}}>📅 直近のアクセス推移</div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:5,height:72}}>
+          {daily.map(([date,count])=>(
+            <div key={date} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+              <div style={{fontSize:10,color:"#1a3a6b",fontFamily:F.sans,fontWeight:700}}>{count}</div>
+              <div style={{width:"100%",borderRadius:"3px 3px 0 0",height:`${Math.max((count/maxD)*50,3)}px`,background:"linear-gradient(180deg,#1a3a6b,#3a6abf)"}}/>
+              <div style={{fontSize:8,color:"#aaa",fontFamily:F.sans,textAlign:"center"}}>{date.split("/").slice(1).join("/")}</div>
+            </div>
+          ))}
+        </div>
+      </div>}
+      {top.length>0&&<div>
+        <div style={{fontSize:13,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,marginBottom:8}}>🏆 よく読まれているお知らせ</div>
+        {top.map(([id,{title,count}],idx)=>{
+          const maxC=top[0][1].count;
+          return(<div key={id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:7}}>
+            <span style={{fontSize:15,flexShrink:0}}>{["🥇","🥈","🥉",""][idx]}</span>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:11,color:"#333",fontFamily:F.sans,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",marginBottom:2}}>{title}</div>
+              <div style={{height:5,background:"#eee",borderRadius:3,overflow:"hidden"}}>
+                <div style={{height:"100%",borderRadius:3,width:`${(count/maxC)*100}%`,background:["#f59e0b","#6b7280","#92400e","#d1d5db"][idx]}}/>
+              </div>
+            </div>
+            <span style={{fontSize:12,color:"#888",fontFamily:F.sans,flexShrink:0,fontWeight:700}}>{count}回</span>
+          </div>);
+        })}
+      </div>}
+      {isAdmin&&daily.length>0&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid #eee"}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#888",fontFamily:F.sans,marginBottom:6}}>🔑 管理者専用：日別ログ</div>
+        {daily.map(([date,count])=>(
+          <div key={date} style={{display:"flex",justifyContent:"space-between",padding:"3px 6px",fontSize:12,fontFamily:F.sans,color:"#555"}}>
+            <span>{date}</span><span style={{fontWeight:700,color:"#1a3a6b"}}>{count}回</span>
+          </div>
+        ))}
+      </div>}
+    </div>
+  );
+}
+
+// ── TOP画面 ──
+function TopScreen({onMember,onAdmin}){
+  return(
+    <div style={{minHeight:"100vh",background:"#fff",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 20px",fontFamily:F.serif}}>
+      <div style={{width:"100%",maxWidth:420,background:"#1a3a6b",borderRadius:16,padding:"26px 22px",textAlign:"center",marginBottom:22,boxShadow:"0 4px 24px rgba(26,58,107,0.18)"}}>
+        <div style={{fontSize:11,letterSpacing:5,color:"#a8c4e8",fontFamily:F.sans,marginBottom:8}}>CITY HOUSE MARUYAMA KITA 3-JO</div>
+        <div style={{fontSize:24,fontWeight:800,color:"#fff",letterSpacing:2,lineHeight:1.4}}>シティハウス円山北3条</div>
+        <div style={{fontSize:16,color:"#c8dcf4",marginTop:5,letterSpacing:2}}>管理組合　組合員専用告知板</div>
+      </div>
+      <div style={{background:"#f4f7fb",border:"2px solid #1a3a6b",borderRadius:16,padding:"20px",textAlign:"center",marginBottom:20,width:"100%",maxWidth:420}}>
+        <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
+          <div style={{padding:8,background:"white",borderRadius:10,border:"1px solid #d0d8e8"}}><QRCode value="https://claude.ai" size=136/></div>
+        </div>
+        <div style={{fontSize:15,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,marginBottom:4}}>QRコードをスキャンしてアクセス</div>
+        <div style={{fontSize:13,color:"#444",fontFamily:F.sans,lineHeight:1.7}}>スマートフォンのカメラで読み取り後<br/><strong>暗証番号を入力</strong>してご覧ください</div>
+      </div>
+      <div style={{width:"100%",maxWidth:420,display:"flex",flexDirection:"column",gap:10}}>
+        <button onClick={onMember} style={{background:"#1a3a6b",border:"none",borderRadius:12,padding:"18px",color:"#fff",fontSize:17,fontWeight:800,cursor:"pointer",fontFamily:F.sans,boxShadow:"0 4px 16px rgba(26,58,107,0.25)"}}>🔒　組合員ページを閲覧する</button>
+        <button onClick={onAdmin} style={{background:"white",border:"2px solid #1a3a6b",borderRadius:12,padding:"12px",color:"#1a3a6b",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>🔑　管理者ログイン</button>
+      </div>
+      <div style={{width:"100%",maxWidth:420,marginTop:16,padding:"13px 15px",background:"#fffbeb",border:"2px solid #d97706",borderRadius:12,fontSize:12,color:"#78350f",fontFamily:F.sans,lineHeight:1.9}}>
+        <strong>📋 このページについて</strong><br/>
+        本ページは<strong>203号室　鈴木章三郎が個人の立場</strong>から、総会議事録・配布資料・理事会書面回答等の公開情報に基づいて作成したものです。<strong>管理組合の公式見解ではありません。</strong>内容の最終的な判断は各組合員にお委ねします。
+      </div>
+    </div>
+  );
+}
+
+// ── PIN画面 ──
+function PinScreen({mode,onSuccess,onBack}){
+  const [pin,setPin]=useState(["","","",""]);
+  const [err,setErr]=useState(false);
+  const [shake,setShake]=useState(false);
+  const change=(idx,val)=>{
+    if(!/^\d?$/.test(val))return;
+    const n=[...pin];n[idx]=val;setPin(n);
+    if(val&&idx<3)document.getElementById(`p${idx+1}`)?.focus();
+    if(n.every(d=>d!=="")){
+      const e=n.join("");
+      const ok=(mode==="member"&&e===MEMBER_PIN)||(mode==="admin"&&e===ADMIN_PIN);
+      if(ok){setErr(false);setTimeout(onSuccess,350);}
+      else{setShake(true);setErr(true);setTimeout(()=>{setShake(false);setPin(["","","",""]);document.getElementById("p0")?.focus();},700);}
+    }
+  };
+  const kd=(idx,e)=>{if(e.key==="Backspace"&&!pin[idx]&&idx>0)document.getElementById(`p${idx-1}`)?.focus();};
+  return(
+    <div style={{minHeight:"100vh",background:"#f4f7fb",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,fontFamily:F.serif}}>
+      <button onClick={onBack} style={{position:"absolute",top:20,left:20,background:"white",border:"2px solid #1a3a6b",color:"#1a3a6b",borderRadius:10,padding:"10px 18px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>← 戻る</button>
+      <div style={{width:"100%",maxWidth:360,background:"white",borderRadius:20,padding:"36px 28px",boxShadow:"0 4px 32px rgba(0,0,0,0.10)",textAlign:"center"}}>
+        <div style={{width:56,height:56,borderRadius:"50%",background:"#eef3fb",border:"3px solid #1a3a6b",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:24}}>{mode==="admin"?"🔑":"🔒"}</div>
+        <div style={{fontSize:21,fontWeight:800,color:"#1a3a6b",marginBottom:8}}>{mode==="admin"?"管理者ログイン":"暗証番号を入力"}</div>
+        <div style={{fontSize:14,color:"#555",fontFamily:F.sans,marginBottom:24,lineHeight:1.7}}>{mode==="admin"?"管理者用4桁PINを入力してください":"4桁の組合員暗証番号を入力してください"}</div>
+        <div style={{display:"flex",gap:12,justifyContent:"center",transform:shake?"translateX(-8px)":"none",transition:"transform 0.1s"}}>
+          {pin.map((d,i)=><input key={i} id={`p${i}`} type="tel" maxLength={1} value={d} onChange={e=>change(i,e.target.value)} onKeyDown={e=>kd(i,e)} autoFocus={i===0} style={{width:60,height:72,textAlign:"center",fontSize:30,fontWeight:800,fontFamily:"monospace",borderRadius:12,background:d?"#eef3fb":"#f5f5f5",border:err?"3px solid #b91c1c":d?"3px solid #1a3a6b":"3px solid #d0d0d0",color:"#1a3a6b"}}/>)}
+        </div>
+        {err&&<div style={{marginTop:14,padding:"10px 14px",background:"#fef2f2",border:"2px solid #b91c1c",borderRadius:10,color:"#b91c1c",fontSize:14,fontWeight:700,fontFamily:F.sans}}>暗証番号が違います。もう一度お試しください。</div>}
+        <div style={{marginTop:20,padding:"10px",background:"#f4f7fb",borderRadius:8,fontSize:13,color:"#666",fontFamily:F.sans}}>デモ用PIN：<strong style={{color:"#1a3a6b"}}>{mode==="member"?"2039":"9999"}</strong></div>
+      </div>
+    </div>
+  );
+}
+
+// ── 反応データの読み書き（localStorage共有） ──
+const RXN_KEY = "kumiai-reactions-v1";
+function loadReactions(){try{const v=localStorage.getItem(RXN_KEY);return v?JSON.parse(v):{};} catch{return {};}}
+function saveReactions(r){try{localStorage.setItem(RXN_KEY,JSON.stringify(r));}catch{}}
+
+// 賛否投票
+function voteYesNo(noticeId, qIdx, type){
+  const r=loadReactions();
+  const k=`${noticeId}-q${qIdx}`;
+  if(!r[k])r[k]={yes:0,no:0,unsure:0,comments:[],interest:0};
+  r[k][type]=(r[k][type]||0)+1;
+  saveReactions(r);return r;
+}
+// 自由記入
+function addComment(noticeId, qIdx, text){
+  const r=loadReactions();
+  const k=`${noticeId}-q${qIdx}`;
+  if(!r[k])r[k]={yes:0,no:0,unsure:0,comments:[],interest:0};
+  r[k].comments=[...(r[k].comments||[]),{text,time:new Date().toLocaleDateString("ja-JP",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"})}];
+  saveReactions(r);return r;
+}
+// 関心度
+function addInterest(noticeId){
+  const r=loadReactions();
+  const k=`${noticeId}-interest`;
+  r[k]=(r[k]||0)+1;
+  saveReactions(r);return r;
+}
+
+// ── 第3層 反応ウィジェット ──
+function Layer3Widget({notice}){
+  const [rxn,setRxn]=useState(loadReactions());
+  const [voted,setVoted]=useState({});
+  const [commented,setCommented]=useState({});
+  const [inputs,setInputs]=useState({});
+  const [interested,setInterested]=useState(false);
+  const [showComments,setShowComments]=useState({});
+
+  // 問いかけを行ごとにパース
+  const questions=(notice.layer3||"").split("\n")
+    .filter(l=>/^[①②③④⑤]/.test(l.trim()))
+    .map((l,i)=>({idx:i,text:l.trim()}));
+
+  const noticeInterest=(rxn[`${notice.id}-interest`]||0);
+  const MAX_INTEREST=63; // 全63戸
+
+  const handleVote=(qIdx,type)=>{
+    if(voted[qIdx])return;
+    const next=voteYesNo(notice.id,qIdx,type);
+    setRxn({...next});
+    setVoted(p=>({...p,[qIdx]:type}));
+  };
+  const handleComment=(qIdx)=>{
+    const t=(inputs[qIdx]||"").trim();
+    if(!t)return;
+    const next=addComment(notice.id,qIdx,t);
+    setRxn({...next});
+    setInputs(p=>({...p,[qIdx]:""}));
+    setCommented(p=>({...p,[qIdx]:true}));
+  };
+  const handleInterest=()=>{
+    if(interested)return;
+    const next=addInterest(notice.id);
+    setRxn({...next});
+    setInterested(true);
+  };
+
+  const getQ=(noticeId,qIdx)=>rxn[`${noticeId}-q${qIdx}`]||{yes:0,no:0,unsure:0,comments:[],interest:0};
+  const total=(q)=>(q.yes||0)+(q.no||0)+(q.unsure||0);
+  const pct=(v,t)=>t>0?Math.round((v/t)*100):0;
+
+  return(
+    <div>
+      {/* 関心度バロメーター */}
+      <div style={{background:"white",border:"2px solid #1a3a6b",borderRadius:14,padding:"16px 18px",marginBottom:18}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
+          <div>
+            <div style={{fontSize:15,fontWeight:800,color:"#1a3a6b",fontFamily:F.sans}}>🌡️ この問題への関心度</div>
+            <div style={{fontSize:12,color:"#888",fontFamily:F.sans,marginTop:2}}>関心がある方はボタンを押してください（匿名・1回のみ）</div>
+          </div>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:32,fontWeight:800,color:"#1a3a6b",fontFamily:F.sans,lineHeight:1}}>{noticeInterest}</div>
+            <div style={{fontSize:11,color:"#888",fontFamily:F.sans}}>/ {MAX_INTEREST}戸</div>
+          </div>
+        </div>
+        {/* バロメーターバー */}
+        <div style={{height:20,background:"#eee",borderRadius:10,overflow:"hidden",marginBottom:12,position:"relative"}}>
+          <div style={{height:"100%",width:`${Math.min((noticeInterest/MAX_INTEREST)*100,100)}%`,background:"linear-gradient(90deg,#1a3a6b,#3a6abf)",borderRadius:10,transition:"width 0.5s"}}/>
+          {[25,50,75].map(p=>(
+            <div key={p} style={{position:"absolute",top:0,left:`${p}%`,height:"100%",borderLeft:"1px dashed rgba(255,255,255,0.5)"}}/>
+          ))}
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#bbb",fontFamily:F.sans,marginBottom:12}}>
+          <span>0戸</span><span>16戸</span><span>32戸</span><span>47戸</span><span>63戸</span>
+        </div>
+        <button onClick={handleInterest} disabled={interested} style={{
+          width:"100%",padding:"12px",borderRadius:10,border:"none",cursor:interested?"default":"pointer",
+          background:interested?"#e0e7ef":"#1a3a6b",color:interested?"#888":"white",
+          fontSize:15,fontWeight:800,fontFamily:F.sans,transition:"all 0.2s"
+        }}>{interested?"✓ 関心を表明しました":"👆 この問題に関心があります"}</button>
+      </div>
+
+      {/* 問いかけ免責バナー */}
+      <div style={{background:"#fef9c3",border:"1px solid #ca8a04",borderRadius:8,padding:"8px 12px",marginBottom:14,fontSize:12,color:"#92400e",fontFamily:F.sans,lineHeight:1.7}}>
+        💬 以下は<strong>組合員の皆様への問いかけ</strong>です。回答はすべて匿名です。皆様の意思表示が管理組合運営の改善につながります。
+      </div>
+
+      {/* 本文テキスト（問い以外の部分） */}
+      {(()=>{
+        const lines=(notice.layer3||"").split("\n");
+        const nonQLines=lines.filter(l=>!/^[①②③④⑤]/.test(l.trim()));
+        const introText=nonQLines.join("\n").replace(/\n{3,}/g,"\n\n").trim();
+        return introText?<p style={{margin:"0 0 16px",lineHeight:2.0,fontSize:14,color:"#555",whiteSpace:"pre-line"}}>{introText}</p>:null;
+      })()}
+
+      {/* 各問いかけ */}
+      {questions.map(({idx,text})=>{
+        const q=getQ(notice.id,idx);
+        const tot=total(q);
+        const myVote=voted[idx];
+        const cmts=q.comments||[];
+        return(
+          <div key={idx} style={{background:"white",border:"2px solid #fde68a",borderRadius:14,padding:"16px",marginBottom:14}}>
+            <p style={{margin:"0 0 14px",fontSize:15,color:"#1a3a6b",fontWeight:700,lineHeight:1.7,fontFamily:F.serif}}>{text}</p>
+
+            {/* 賛否ボタン */}
+            <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
+              {[
+                {type:"yes",  label:"👍 そう思う",   active:"#1a3a6b", light:"#eef3fb"},
+                {type:"no",   label:"👎 思わない",   active:"#b91c1c", light:"#fef2f2"},
+                {type:"unsure",label:"🤔 わからない",active:"#6b7280", light:"#f3f4f6"},
+              ].map(({type,label,active,light})=>(
+                <button key={type} onClick={()=>handleVote(idx,type)} disabled={!!myVote} style={{
+                  flex:1,minWidth:80,padding:"9px 4px",borderRadius:8,border:`2px solid ${myVote===type?active:"#e0e0e0"}`,
+                  background:myVote===type?active:light,color:myVote===type?"white":"#444",
+                  fontSize:13,fontWeight:myVote===type?800:600,fontFamily:F.sans,cursor:myVote?"default":"pointer",
+                  transition:"all 0.2s"
+                }}>
+                  {label}<br/>
+                  <span style={{fontSize:16,fontWeight:800}}>{q[type]||0}</span>
+                  {tot>0&&<span style={{fontSize:10,opacity:0.8}}> ({pct(q[type]||0,tot)}%)</span>}
+                </button>
+              ))}
+            </div>
+
+            {/* 得票バー */}
+            {tot>0&&(
+              <div style={{display:"flex",height:8,borderRadius:4,overflow:"hidden",marginBottom:12}}>
+                {[{t:"yes",c:"#1a3a6b"},{t:"no",c:"#b91c1c"},{t:"unsure",c:"#9ca3af"}].map(({t,c})=>
+                  (q[t]||0)>0?<div key={t} style={{width:`${pct(q[t]||0,tot)}%`,background:c,transition:"width 0.4s"}}/>:null
+                )}
+              </div>
+            )}
+            <div style={{fontSize:11,color:"#aaa",fontFamily:F.sans,marginBottom:14}}>回答数：{tot}件</div>
+
+            {/* 自由記入 */}
+            <div style={{borderTop:"1px solid #f0f0f0",paddingTop:12}}>
+              <div style={{fontSize:12,color:"#666",fontFamily:F.sans,fontWeight:700,marginBottom:8}}>💭 ご意見・コメント（任意・匿名）</div>
+              {!commented[idx]?(
+                <div style={{display:"flex",gap:8}}>
+                  <input type="text" value={inputs[idx]||""} onChange={e=>setInputs(p=>({...p,[idx]:e.target.value}))}
+                    onKeyDown={e=>e.key==="Enter"&&handleComment(idx)}
+                    placeholder="ご意見をご記入ください（任意）"
+                    style={{flex:1,padding:"9px 12px",border:"1px solid #ddd",borderRadius:8,fontSize:13,fontFamily:F.serif,color:"#333"}}/>
+                  <button onClick={()=>handleComment(idx)} style={{padding:"9px 16px",background:"#d97706",border:"none",borderRadius:8,color:"white",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F.sans,flexShrink:0}}>送信</button>
+                </div>
+              ):(
+                <div style={{padding:"8px 12px",background:"#fff7e6",borderRadius:8,fontSize:13,color:"#92400e",fontFamily:F.sans}}>✓ コメントを送信しました</div>
+              )}
+              {/* コメント一覧 */}
+              {cmts.length>0&&(
+                <div style={{marginTop:10}}>
+                  <button onClick={()=>setShowComments(p=>({...p,[idx]:!p[idx]}))} style={{background:"none",border:"none",color:"#1a3a6b",fontSize:12,fontFamily:F.sans,cursor:"pointer",fontWeight:700,padding:0}}>
+                    {showComments[idx]?"▼":"▶"} 組合員のコメント（{cmts.length}件）
+                  </button>
+                  {showComments[idx]&&(
+                    <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+                      {cmts.map((c,ci)=>(
+                        <div key={ci} style={{background:"#f8f8f8",borderRadius:8,padding:"8px 12px",fontSize:13,color:"#444",fontFamily:F.sans,lineHeight:1.7}}>
+                          <span style={{fontSize:10,color:"#bbb",display:"block",marginBottom:3}}>{c.time}　匿名</span>
+                          {c.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── 詳細画面（3層構造） ──
+function DetailScreen({notice,onBack,onView}){
+  const [tab,setTab]=useState("layer1");
+  useEffect(()=>{onView(notice.id,notice.title);},[]);
+
+  const tabs=[
+    {key:"layer1",label:"📋 事実・確認事項",color:"#1a3a6b",bg:"#eef3fb"},
+    {key:"layer2",label:"🔍 詳細分析（私見）",color:"#166534",bg:"#f0fdf4"},
+    {key:"layer3",label:"💬 皆様へのお問いかけ",color:"#92400e",bg:"#fff7e6"},
+  ];
+  const currentTab=tabs.find(t=>t.key===tab);
+  const content=notice[tab]||notice.layer1||"";
+
+  return(
+    <div style={{minHeight:"100vh",background:"#f4f7fb",fontFamily:F.serif}}>
+      <div style={{background:"#1a3a6b",padding:"14px 18px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onBack} style={{background:"white",border:"none",color:"#1a3a6b",borderRadius:8,padding:"9px 16px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>← 一覧へ</button>
+        <span style={{color:"#c8dcf4",fontSize:13,fontFamily:F.sans,fontWeight:600}}>シティハウス円山北3条 管理組合</span>
+      </div>
+
+      <div style={{padding:"18px 16px",maxWidth:700,margin:"0 auto"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,flexWrap:"wrap"}}>
+          <span style={{background:notice.categoryColor,color:"white",fontSize:12,fontWeight:800,padding:"3px 12px",borderRadius:5,fontFamily:F.sans}}>{notice.category}</span>
+          {notice.pinned&&<span style={{background:"#fff7e6",border:"2px solid #d97706",color:"#92400e",fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:5,fontFamily:F.sans}}>📌 重要</span>}
+          <span style={{fontSize:13,color:"#555",fontFamily:F.sans}}>{notice.date}</span>
+          <span style={{fontSize:11,color:"#777",fontFamily:F.sans,marginLeft:"auto"}}>{notice.tag}</span>
+        </div>
+        <h1 style={{fontSize:19,color:"#1a3a6b",margin:"0 0 16px",lineHeight:1.6,fontWeight:800}}>{notice.title}</h1>
+
+        {/* 3層タブ */}
+        <div style={{display:"flex",gap:0,marginBottom:0,borderRadius:"12px 12px 0 0",overflow:"hidden",border:"2px solid #dce4f0",borderBottom:"none"}}>
+          {tabs.map((t,i)=>(
+            <button key={t.key} onClick={()=>setTab(t.key)} style={{
+              flex:1,padding:"10px 4px",border:"none",cursor:"pointer",
+              fontSize:11,fontWeight:tab===t.key?800:600,fontFamily:F.sans,
+              background:tab===t.key?t.bg:"#f4f7fb",
+              color:tab===t.key?t.color:"#888",
+              borderRight:i<2?"1px solid #dce4f0":"none",
+              transition:"all 0.2s",lineHeight:1.4
+            }}>{t.label}</button>
+          ))}
+        </div>
+
+        {/* 層の内容 */}
+        <div style={{background:currentTab.bg,border:"2px solid #dce4f0",borderTop:"none",borderRadius:"0 0 12px 12px",padding:"18px 16px",marginBottom:16}}>
+          {tab==="layer2"&&(
+            <div style={{background:"#dcfce7",border:"1px solid #16a34a",borderRadius:8,padding:"8px 12px",marginBottom:14,fontSize:12,color:"#166534",fontFamily:F.sans,lineHeight:1.7}}>
+              ⚠ 以下は<strong>203号室　鈴木章三郎の個人的な分析・見解</strong>です。評価・考察部分については各組合員のご判断にお委ねします。
+            </div>
+          )}
+
+          {/* 第3層は反応ウィジェットで表示 */}
+          {tab==="layer3"
+            ? <Layer3Widget notice={notice}/>
+            : <p style={{margin:0,lineHeight:2.1,fontSize:15,color:"#222",whiteSpace:"pre-line"}}>{content}</p>
+          }
+        </div>
+
+        {/* 添付ファイル */}
+        {(notice.attachments||[]).length>0&&(
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:16,color:"#1a3a6b",fontWeight:800,fontFamily:F.sans,marginBottom:12}}>📎 添付ファイル</div>
+            {notice.attachments.map((att,idx)=>(
+              <div key={idx} style={{background:"white",borderRadius:10,padding:12,marginBottom:10,border:"1px solid #d0d8e8"}}>
+                {att.type==="image"
+                  ?<><div style={{fontSize:14,color:"#1a3a6b",fontWeight:700,fontFamily:F.sans,marginBottom:6}}>🖼️ {att.name}</div><img src={att.data} alt={att.name} style={{width:"100%",borderRadius:6}}/></>
+                  :<><div style={{fontSize:14,color:"#1a3a6b",fontWeight:700,fontFamily:F.sans,marginBottom:8}}>📄 {att.name}</div><iframe src={att.data} title={att.name} style={{width:"100%",height:480,border:"none",borderRadius:6}}/><a href={att.data} download={att.name} style={{display:"inline-block",marginTop:8,background:"#1a3a6b",color:"white",textDecoration:"none",padding:"8px 18px",borderRadius:7,fontSize:13,fontWeight:700,fontFamily:F.sans}}>⬇ PDFをダウンロード</a></>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{padding:"13px 15px",background:"#eef3fb",borderRadius:10,borderLeft:"4px solid #1a3a6b"}}>
+          <p style={{margin:0,fontSize:13,color:"#1a3a6b",fontFamily:F.sans,lineHeight:1.8,fontWeight:600}}>
+            📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。管理組合の公式見解ではありません。ご質問は203号室までお申し付けください。
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 管理者編集 ──
+const TEMPLATES={
+  layer1:"【出典】令和〇年度定期総会議事録・配布資料（20〇〇年）\n\n■ 確認された事実\n\n（事実のみを記載してください）\n\n■ 現時点で理事会への確認を求めている事項\n\n① （確認事項1）（開示請求中・未回答）\n② （確認事項2）（確認中）\n\n【参考法令】区分所有法第〇〇条、標準管理規約第〇〇条",
+  layer2:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 〜への考察\n\n（回答や状況）がありました。\n\n私はこの回答が問いに十分答えていないと考えています。私が問うているのは（本質的な問い）という点です。\n\n■ （影響・問題点）について\n\n（具体的な考察を記載）",
+  layer3:"① （問いかけ1）\n② （問いかけ2）\n③ （問いかけ3）\n\nご意見は203号室・鈴木章三郎までお寄せください。"
+};
+
+function AdminEditScreen({notice,isNew,onSave,onCancel}){
+  const [form,setForm]=useState({...notice,attachments:notice.attachments||[],layer1:notice.layer1||"",layer2:notice.layer2||"",layer3:notice.layer3||""});
+  const [editTab,setEditTab]=useState("layer1");
+  const [showPreview,setShowPreview]=useState(false);
+  const txtRefs={layer1:useRef(),layer2:useRef(),layer3:useRef()},layer3:useRef()};
+
+  const iS={width:"100%",padding:"12px 14px",border:"1px solid #c8d6e8",borderRadius:10,fontSize:15,fontFamily:F.serif,boxSizing:"border-box",marginTop:5,color:"#1a3a6b",background:"white",lineHeight:1.7};
+  const lS={fontSize:13,color:"#555",fontFamily:F.sans,fontWeight:700,display:"block",marginTop:16,marginBottom:2};
+
+  const handleTxt=e=>{
+    const f=e.target.files[0];if(!f)return;
+    if(!f.name.match(/\.(txt|md)$/i)){alert(".txtファイルを選択してください");e.target.value="";return;}
+    const r=new FileReader();
+    r.onload=ev=>setForm(p=>({...p,[editTab]:p[editTab]?p[editTab]+"\n\n"+ev.target.result:ev.target.result}));
+    r.readAsText(f,"UTF-8");e.target.value="";
+  };
+  const insertTemplate=()=>{
+    const t=TEMPLATES[editTab];
+    if(!form[editTab]){setForm(p=>({...p,[editTab]:t}));}
+    else if(window.confirm("既存の内容にテンプレートを追記しますか？")){setForm(p=>({...p,[editTab]:p[editTab]+"\n\n"+t}));}
+  };
+
+  // チェックリスト
+  const checks=[
+    {label:"タイトルが入力されている",ok:!!form.title.trim()},
+    {label:"概要が入力されている",ok:!!form.summary.trim()},
+    {label:"第1層（事実）に【出典】が明記されている",ok:form.layer1.includes("出典")},
+    {label:"第2層（分析）に「個人的な見解」の免責文がある",ok:form.layer2.includes("個人")},
+    {label:"第3層（問いかけ）に①②③形式の問いがある",ok:/[①②③]/.test(form.layer3)},
+    {label:"断定的な表現（「〜は問題だ」「〜は不正だ」）を避けている",ok:!/(問題である|違反である|不正である|悪質)/.test(form.layer1+form.layer2)},
+  ];
+  const canSave=!!form.title.trim()&&!!form.layer1.trim();
+
+  const tabDefs=[
+    {key:"layer1",label:"📋 第1層：事実",hint:"出典明記・事実のみ",color:"#1a3a6b",bg:"#eef3fb",hintBg:"#dbeafe",hintColor:"#1e40af",
+     placeholder:"【出典】〇〇議事録・配布資料（2025年）\n\n■ 確認された事実\n\n（事実のみを記載）\n\n■ 理事会への確認事項\n\n① \n② \n\n【参考法令】"},
+    {key:"layer2",label:"🔍 第2層：分析",hint:"私見として明示",color:"#166534",bg:"#f0fdf4",hintBg:"#dcfce7",hintColor:"#166534",
+     placeholder:"【以下は203号室・鈴木章三郎の個人的な分析・見解です。判断は各組合員にお委ねします。】\n\n■ 〜への考察\n\n私はこの点が適切かどうか疑問を持っています。\n\n（具体的な考察）"},
+    {key:"layer3",label:"💬 第3層：問いかけ",hint:"①②③形式で入力",color:"#92400e",bg:"#fff7e6",hintBg:"#fef9c3",hintColor:"#92400e",
+     placeholder:"① （問いかけ1）\n② （問いかけ2）\n③ （問いかけ3）\n\nご意見は203号室・鈴木章三郎までお寄せください。"},
+  ];
+  const ct=tabDefs.find(t=>t.key===editTab);
+
+  return(
+    <div style={{minHeight:"100vh",background:"#f4f7fb",fontFamily:F.serif}}>
+      {/* ヘッダー */}
+      <div style={{background:"#1a3a6b",padding:"14px 18px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onCancel} style={{background:"white",border:"none",color:"#1a3a6b",borderRadius:8,padding:"9px 16px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>← 戻る</button>
+        <span style={{color:"white",fontSize:16,fontWeight:700,fontFamily:F.sans}}>{isNew?"新規お知らせ作成":"お知らせ編集"}</span>
+        <button onClick={()=>setShowPreview(!showPreview)} style={{marginLeft:"auto",background:showPreview?"white":"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.4)",color:showPreview?"#1a3a6b":"white",borderRadius:8,padding:"7px 14px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>
+          {showPreview?"✏ 編集に戻る":"👁 プレビュー"}
+        </button>
+      </div>
+
+      <div style={{padding:"16px",maxWidth:660,margin:"0 auto"}}>
+
+        {/* プレビューモード */}
+        {showPreview&&(
+          <div style={{background:"white",borderRadius:14,padding:"18px",boxShadow:"0 2px 16px rgba(0,0,0,0.08)",marginBottom:16,borderLeft:`5px solid ${CAT_COLOR[form.category]||"#1a3a6b"}`}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,flexWrap:"wrap"}}>
+              <span style={{background:CAT_COLOR[form.category]||"#1a3a6b",color:"white",fontSize:12,fontWeight:800,padding:"3px 12px",borderRadius:5,fontFamily:F.sans}}>{form.category||"カテゴリ"}</span>
+              {form.pinned&&<span style={{background:"#fff7e6",border:"1px solid #d97706",color:"#92400e",fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:5,fontFamily:F.sans}}>📌 重要</span>}
+              <span style={{fontSize:12,color:"#888",fontFamily:F.sans}}>{form.date}</span>
+              <span style={{fontSize:11,color:"#aaa",fontFamily:F.sans,marginLeft:"auto"}}>{form.tag}</span>
+            </div>
+            <h2 style={{fontSize:17,color:"#1a3a6b",margin:"0 0 8px",lineHeight:1.6,fontWeight:800}}>{form.title||"（タイトル未入力）"}</h2>
+            <p style={{fontSize:13,color:"#666",margin:"0 0 14px",lineHeight:1.7,fontFamily:F.sans}}>{form.summary||"（概要未入力）"}</p>
+            <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {form.layer1&&<span style={{fontSize:10,background:"#eef3fb",color:"#1a3a6b",borderRadius:4,padding:"2px 7px",fontFamily:F.sans}}>事実あり</span>}
+              {form.layer2&&<span style={{fontSize:10,background:"#f0fdf4",color:"#166534",borderRadius:4,padding:"2px 7px",fontFamily:F.sans}}>分析あり</span>}
+              {form.layer3&&<span style={{fontSize:10,background:"#fff7e6",color:"#92400e",borderRadius:4,padding:"2px 7px",fontFamily:F.sans}}>問いかけあり</span>}
+            </div>
+          </div>
+        )}
+
+        {/* 基本情報カード */}
+        <div style={{background:"white",borderRadius:12,padding:"16px",boxShadow:"0 1px 8px rgba(0,0,0,0.06)",marginBottom:14}}>
+          <p style={{fontSize:14,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,margin:"0 0 12px"}}>基本情報</p>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            <div>
+              <label style={lS}>カテゴリ</label>
+              <select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} style={{...iS,padding:"10px 12px"}}>
+                {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={lS}>タグ（シリーズ）</label>
+              <select value={form.tag} onChange={e=>setForm({...form,tag:e.target.value})} style={{...iS,padding:"10px 12px"}}>
+                {TAGS.filter(t=>t!=="すべて").map(t=><option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+          <label style={lS}>掲示日</label>
+          <input type="text" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} style={{...iS,maxWidth:220}}/>
+          <label style={lS}>タイトル <span style={{color:"#b91c1c",fontSize:11}}>必須</span></label>
+          <input type="text" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} style={iS} placeholder="例：修繕積立金改定の経緯と確認事項のご報告"/>
+          <label style={lS}>概要（一覧に表示される説明文）</label>
+          <textarea value={form.summary} onChange={e=>setForm({...form,summary:e.target.value})} style={{...iS,height:72,resize:"vertical"}} placeholder="一覧画面に表示される短い説明文（2〜3行）"/>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginTop:12,padding:"10px 12px",background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8}}>
+            <input type="checkbox" id="ep" checked={form.pinned} onChange={e=>setForm({...form,pinned:e.target.checked})} style={{width:16,height:16,cursor:"pointer",flexShrink:0}}/>
+            <label htmlFor="ep" style={{fontSize:13,fontFamily:F.sans,color:"#92400e",cursor:"pointer",fontWeight:600}}>📌 重要掲示として一覧の先頭に固定する</label>
+          </div>
+        </div>
+
+        {/* 3層エディタ */}
+        <div style={{background:"white",borderRadius:12,padding:"16px",boxShadow:"0 1px 8px rgba(0,0,0,0.06)",marginBottom:14}}>
+          <p style={{fontSize:14,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,margin:"0 0 10px"}}>本文（3層構成）</p>
+
+          {/* タブ */}
+          <div style={{display:"flex",borderRadius:"10px 10px 0 0",overflow:"hidden",border:"1px solid #dce4f0",borderBottom:"none",marginBottom:0}}>
+            {tabDefs.map((t,i)=>(
+              <button key={t.key} onClick={()=>setEditTab(t.key)} style={{
+                flex:1,padding:"10px 4px",border:"none",cursor:"pointer",
+                fontSize:11,fontFamily:F.sans,lineHeight:1.4,
+                fontWeight:editTab===t.key?700:500,
+                background:editTab===t.key?t.bg:"#f8f9fb",
+                color:editTab===t.key?t.color:"#888",
+                borderRight:i<2?"1px solid #dce4f0":"none",
+                transition:"all 0.15s",
+                borderBottom:editTab===t.key?`2px solid ${t.color}`:"2px solid transparent"
+              }}>{t.label}<br/><span style={{fontSize:9,opacity:0.7}}>{t.hint}</span></button>
+            ))}
+          </div>
+
+          {/* エディタ本体 */}
+          <div style={{border:"1px solid #dce4f0",borderTop:"none",borderRadius:"0 0 10px 10px",padding:"12px",background:ct.bg}}>
+            <div style={{background:ct.hintBg,borderRadius:7,padding:"7px 11px",marginBottom:10,fontSize:12,color:ct.hintColor,lineHeight:1.7}}>
+              {editTab==="layer1"&&"📋 出典を明記し、事実のみを記載してください。評価・断定表現は避けます。"}
+              {editTab==="layer2"&&"🔍 個人的な分析・見解として明示してください。「〜と考えています」など私見であることを明記します。"}
+              {editTab==="layer3"&&"💬 ①②③の形式で問いかけを記載してください。自動的に賛否ボタン・コメント欄が生成されます。"}
+            </div>
+            <div style={{display:"flex",gap:8,marginBottom:8,flexWrap:"wrap"}}>
+              <button onClick={insertTemplate} style={{background:"white",border:"1px solid #1a3a6b",color:"#1a3a6b",borderRadius:7,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>
+                📋 テンプレートを挿入
+              </button>
+              <button onClick={()=>txtRefs[editTab].current.click()} style={{background:"white",border:"1px solid #1a3a6b",color:"#1a3a6b",borderRadius:7,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>
+                📄 txtから読み込む
+              </button>
+              {Object.keys(txtRefs).map(k=><input key={k} ref={txtRefs[k]} type="file" accept=".txt,.md" style={{display:"none"}} onChange={handleTxt}/>)}
+            </div>
+            <textarea value={form[editTab]} onChange={e=>setForm({...form,[editTab]:e.target.value})}
+              style={{...iS,height:200,resize:"vertical",marginTop:0,background:"white",border:"1px solid #c8d6e8"}}
+              placeholder={ct.placeholder}/>
+            <div style={{fontSize:11,color:"#aaa",fontFamily:F.sans,textAlign:"right",marginTop:3}}>{form[editTab].length} 文字</div>
+          </div>
+        </div>
+
+        {/* チェックリスト */}
+        <div style={{background:"white",borderRadius:12,padding:"16px",boxShadow:"0 1px 8px rgba(0,0,0,0.06)",marginBottom:16}}>
+          <p style={{fontSize:14,fontWeight:700,color:"#1a3a6b",fontFamily:F.sans,margin:"0 0 10px"}}>✅ 掲示前チェックリスト</p>
+          <div style={{display:"flex",flexDirection:"column",gap:7}}>
+            {checks.map((c,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontFamily:F.sans}}>
+                <span style={{fontSize:15,flexShrink:0,color:c.ok?"#166534":"#b91c1c"}}>{c.ok?"✓":"✗"}</span>
+                <span style={{color:c.ok?"#333":"#888",textDecoration:c.ok?"none":"none"}}>{c.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 保存ボタン */}
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={()=>{if(!canSave)return;onSave({...form,categoryColor:CAT_COLOR[form.category]||"#1a3a6b"});}}
+            disabled={!canSave}
+            style={{flex:1,background:canSave?"#1a3a6b":"#aaa",color:"white",border:"none",borderRadius:10,padding:"15px",fontSize:16,fontWeight:800,cursor:canSave?"pointer":"not-allowed",fontFamily:F.sans}}>
+            {isNew?"✓ 掲示する":"✓ 更新する"}
+          </button>
+          <button onClick={onCancel} style={{flex:1,background:"#888",color:"white",border:"none",borderRadius:10,padding:"15px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>
+            キャンセル
+          </button>
+        </div>
+        <p style={{fontSize:12,color:"#aaa",fontFamily:F.sans,marginTop:8,textAlign:"center"}}>タイトルと第1層（事実）は必須です</p>
+      </div>
+    </div>
+  );
+
+// ── 管理者ダッシュボード ──
+function AdminScreen({notices,stats,onNew,onEdit,onTogglePin,onDelete,onLogout}){
+  const [del,setDel]=useState(null);
+  return(
+    <div style={{minHeight:"100vh",background:"#f0f2f5",fontFamily:F.serif}}>
+      <div style={{background:"#1a252f",padding:"14px 18px",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onLogout} style={{background:"white",border:"none",color:"#1a252f",borderRadius:8,padding:"9px 16px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>← ログアウト</button>
+        <span style={{color:"white",fontSize:17,fontWeight:800,fontFamily:F.sans}}>🔑 管理者ダッシュボード</span>
+        <button onClick={onNew} style={{marginLeft:"auto",background:"#f59e0b",border:"none",borderRadius:10,padding:"9px 18px",color:"#1a252f",fontSize:15,fontWeight:800,cursor:"pointer",fontFamily:F.sans}}>＋ 新規作成</button>
+      </div>
+      <div style={{padding:"14px",maxWidth:700,margin:"0 auto"}}>
+        <AccessCounter stats={stats} isAdmin={true}/>
+        <div style={{background:"#fffbeb",border:"2px solid #f59e0b",borderRadius:10,padding:"12px 16px",marginBottom:14,fontSize:14,fontFamily:F.sans,color:"#78350f",fontWeight:600}}>⚠ 管理者モード：追加・編集・削除・固定が可能です</div>
+        {notices.map(n=>(
+          <div key={n.id} style={{background:"white",borderRadius:12,marginBottom:10,boxShadow:"0 2px 10px rgba(0,0,0,0.08)",overflow:"hidden",borderLeft:`5px solid ${n.categoryColor}`}}>
+            <div style={{padding:"13px 15px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6,flexWrap:"wrap"}}>
+                <span style={{background:n.categoryColor,color:"white",fontSize:12,fontWeight:800,padding:"3px 10px",borderRadius:4,fontFamily:F.sans}}>{n.category}</span>
+                {n.pinned&&<span style={{fontSize:12,color:"#d97706",fontFamily:F.sans,fontWeight:700}}>📌</span>}
+                <span style={{marginLeft:"auto",fontSize:12,color:"#666",fontFamily:F.sans}}>{n.date}</span>
+              </div>
+              <div style={{fontSize:14,color:"#1a3a6b",fontWeight:700,lineHeight:1.5,marginBottom:4}}>{n.title}</div>
+              <div style={{display:"flex",gap:8,fontSize:11,fontFamily:F.sans,color:"#aaa"}}>
+                {n.layer1&&<span style={{background:"#eef3fb",borderRadius:4,padding:"2px 6px",color:"#1a3a6b"}}>第1層✓</span>}
+                {n.layer2&&<span style={{background:"#f0fdf4",borderRadius:4,padding:"2px 6px",color:"#166534"}}>第2層✓</span>}
+                {n.layer3&&<span style={{background:"#fff7e6",borderRadius:4,padding:"2px 6px",color:"#92400e"}}>第3層✓</span>}
+              </div>
+            </div>
+            <div style={{display:"flex",borderTop:"1px solid #f0f0f0"}}>
+              <button onClick={()=>onEdit(n)} style={{flex:1,padding:"10px",background:"#f4f7fb",border:"none",cursor:"pointer",fontSize:14,color:"#1a3a6b",fontFamily:F.sans,fontWeight:700}}>✏ 編集</button>
+              <button onClick={()=>onTogglePin(n.id)} style={{flex:1,padding:"10px",background:"white",border:"none",borderLeft:"1px solid #f0f0f0",cursor:"pointer",fontSize:13,color:n.pinned?"#d97706":"#888",fontFamily:F.sans}}>{n.pinned?"📌 解除":"📌 固定"}</button>
+              {del===n.id?(<>
+                <button onClick={()=>{onDelete(n.id);setDel(null);}} style={{flex:1,padding:"10px",background:"#b91c1c",border:"none",borderLeft:"1px solid #f0f0f0",cursor:"pointer",fontSize:14,color:"white",fontFamily:F.sans,fontWeight:800}}>本当に削除</button>
+                <button onClick={()=>setDel(null)} style={{flex:1,padding:"10px",background:"#eee",border:"none",borderLeft:"1px solid #f0f0f0",cursor:"pointer",fontSize:13,color:"#555",fontFamily:F.sans}}>取消</button>
+              </>):(
+                <button onClick={()=>setDel(n.id)} style={{flex:1,padding:"10px",background:"white",border:"none",borderLeft:"1px solid #f0f0f0",cursor:"pointer",fontSize:13,color:"#b91c1c",fontFamily:F.sans,fontWeight:700}}>🗑 削除</button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── 一覧画面 ──
+function BoardScreen({notices,stats,onSelect,onLogout}){
+  const [tag,setTag]=useState("すべて");
+  const sorted=[...(tag==="すべて"?notices:notices.filter(n=>n.tag===tag))].sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||b.id-a.id);
+  return(
+    <div style={{minHeight:"100vh",background:"#f4f7fb",fontFamily:F.serif}}>
+      <div style={{background:"#1a3a6b",padding:"18px 18px 0"}}>
+        <div style={{maxWidth:700,margin:"0 auto"}}>
+          <div style={{display:"flex",alignItems:"center",marginBottom:6}}>
+            <div>
+              <div style={{fontSize:12,color:"#a8c4e8",letterSpacing:4,fontFamily:F.sans,marginBottom:3}}>MEMBERS ONLY</div>
+              <h1 style={{color:"white",fontSize:20,margin:0,letterSpacing:2,fontWeight:800}}>組合員専用告知板</h1>
+              <p style={{color:"#c8dcf4",fontSize:13,margin:"3px 0 0",fontFamily:F.sans}}>シティハウス円山北3条　管理組合</p>
+            </div>
+            <button onClick={onLogout} style={{marginLeft:"auto",background:"white",border:"none",color:"#1a3a6b",borderRadius:8,padding:"9px 14px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F.sans}}>ログアウト</button>
+          </div>
+          <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:12,marginTop:10}}>
+            {TAGS.map(t=><span key={t} onClick={()=>setTag(t)} style={{flexShrink:0,borderRadius:20,padding:"6px 14px",fontSize:13,fontFamily:F.sans,whiteSpace:"nowrap",cursor:"pointer",fontWeight:600,background:tag===t?"white":"rgba(255,255,255,0.12)",color:tag===t?"#1a3a6b":"#c8dcf4",border:tag===t?"none":"1px solid rgba(255,255,255,0.25)"}}>{t}</span>)}
+          </div>
+        </div>
+      </div>
+      <div style={{padding:"14px",maxWidth:700,margin:"0 auto"}}>
+        <AccessCounter stats={stats} isAdmin={false}/>
+        <div style={{fontSize:13,color:"#666",fontFamily:F.sans,marginBottom:10,fontWeight:600}}>{sorted.length}件のお知らせ</div>
+        {sorted.map(n=>(
+          <div key={n.id} onClick={()=>onSelect(n)}
+            style={{background:"white",borderRadius:14,marginBottom:12,boxShadow:"0 2px 12px rgba(0,0,0,0.08)",overflow:"hidden",cursor:"pointer",borderLeft:`6px solid ${n.categoryColor}`}}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(0,0,0,0.13)";}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.08)";}}>
+            <div style={{padding:"15px 17px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8,flexWrap:"wrap"}}>
+                <span style={{background:n.categoryColor,color:"white",fontSize:12,fontWeight:800,padding:"3px 10px",borderRadius:4,fontFamily:F.sans}}>{n.category}</span>
+                {n.pinned&&<span style={{background:"#fff7e6",border:"1px solid #d97706",color:"#92400e",fontSize:11,fontWeight:700,padding:"2px 7px",borderRadius:4,fontFamily:F.sans}}>📌 重要</span>}
+                <span style={{fontSize:12,color:"#666",fontFamily:F.sans}}>{n.date}</span>
+                {/* 層インジケーター */}
+                <span style={{marginLeft:"auto",display:"flex",gap:3}}>
+                  {n.layer1&&<span style={{fontSize:9,background:"#eef3fb",color:"#1a3a6b",borderRadius:3,padding:"1px 5px",fontFamily:F.sans}}>事実</span>}
+                  {n.layer2&&<span style={{fontSize:9,background:"#f0fdf4",color:"#166534",borderRadius:3,padding:"1px 5px",fontFamily:F.sans}}>分析</span>}
+                  {n.layer3&&<span style={{fontSize:9,background:"#fff7e6",color:"#92400e",borderRadius:3,padding:"1px 5px",fontFamily:F.sans}}>対話</span>}
+                </span>
+              </div>
+              <h3 style={{margin:"0 0 5px",fontSize:15,color:"#1a3a6b",lineHeight:1.5,fontWeight:800}}>{n.title}</h3>
+              <p style={{margin:0,fontSize:12,color:"#555",lineHeight:1.7,fontFamily:F.sans}}>{n.summary}</p>
+            </div>
+            <div style={{background:"#f4f7fb",padding:"8px 17px",fontSize:12,color:"#1a3a6b",fontFamily:F.sans,fontWeight:700,display:"flex",justifyContent:"flex-end"}}>詳細を読む →</div>
+          </div>
+        ))}
+      </div>
+      <div style={{textAlign:"center",padding:"16px 16px 40px",borderTop:"1px solid #dce4f0"}}>
+        <p style={{fontSize:12,color:"#888",fontFamily:F.sans,lineHeight:2.0,margin:0}}>
+          本ページは203号室　鈴木章三郎が個人の立場から公開情報に基づき作成したものです。<br/>
+          管理組合の公式見解ではありません。内容の判断は各組合員にお委ねします。<br/>
+          <span style={{fontSize:11,color:"#bbb"}}>第三者への共有・転載はご遠慮ください。</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── メインアプリ ──
+function App(){
+  const [phase,setPhase]=useState("top");
+  const [notices,setNotices]=useState(INITIAL_NOTICES);
+  const [sel,setSel]=useState(null);
+  const [edit,setEdit]=useState(null);
+  const [isNew,setIsNew]=useState(false);
+  const [stats,setStats]=useState(null);
+
+  const doMemberLogin=()=>{const s=recordLogin();setStats(s);setPhase("board");};
+  const doAdminLogin=()=>{setStats(loadStats());setPhase("admin");};
+  const doView=(id,title)=>{recordArticle(String(id),title);setStats(loadStats());};
+  const blank=()=>({id:Date.now(),category:"お知らせ",categoryColor:"#1a3a6b",pinned:false,date:new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"}),title:"",summary:"",layer1:"",layer2:"",layer3:"",tag:"組合員の権利",attachments:[]});
+
+  if(phase==="top")       return <TopScreen onMember={()=>setPhase("pinMember")} onAdmin={()=>setPhase("pinAdmin")}/>;
+  if(phase==="pinMember") return <PinScreen mode="member" onSuccess={doMemberLogin} onBack={()=>setPhase("top")}/>;
+  if(phase==="pinAdmin")  return <PinScreen mode="admin"  onSuccess={doAdminLogin}  onBack={()=>setPhase("top")}/>;
+  if(phase==="board")     return <BoardScreen notices={notices} stats={stats} onSelect={n=>{setSel(n);setPhase("detail");}} onLogout={()=>setPhase("top")}/>;
+  if(phase==="detail"&&sel) return <DetailScreen notice={sel} onView={doView} onBack={()=>setPhase("board")}/>;
+  if(phase==="admin")     return <AdminScreen notices={notices} stats={stats}
+    onNew={()=>{setEdit(blank());setIsNew(true);setPhase("adminEdit");}}
+    onEdit={n=>{setEdit({...n,layer1:n.layer1||"",layer2:n.layer2||"",layer3:n.layer3||"",attachments:n.attachments||[]});setIsNew(false);setPhase("adminEdit");}}
+    onTogglePin={id=>setNotices(p=>p.map(n=>n.id===id?{...n,pinned:!n.pinned}:n))}
+    onDelete={id=>setNotices(p=>p.filter(n=>n.id!==id))}
+    onLogout={()=>setPhase("top")}/>;
+  if(phase==="adminEdit"&&edit) return <AdminEditScreen notice={edit} isNew={isNew}
+    onSave={s=>{setNotices(p=>isNew?[s,...p]:p.map(n=>n.id===s.id?s:n));setPhase("admin");}}
+    onCancel={()=>setPhase("admin")}/>;
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+</script>
+</body>
+</html>
