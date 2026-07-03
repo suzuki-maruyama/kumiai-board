@@ -169,7 +169,6 @@ function pinInput(idx,val){
         if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
         STATS.today=(STATS.today||0)+1;
         saveAll();
-        buildBoard();
         if(MODE==="admin"){buildAdmin();show("admin");}else{buildBoard();show("board");}
       }else{
         if(MODE==="admin"){buildAdmin();show("admin");}else{buildBoard();show("board");}
