@@ -7,14 +7,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#f4f7fb;font-family:sans-serif;}
-.screen{display:none;min-height:100vh;}
+.screen{display:none;}
 .notice-card{background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
 .notice-footer{background:#f4f7fb;padding:7px 15px;font-size:12px;color:#1a3a6b;font-weight:bold;text-align:right;}
 pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;color:#222;}
 </style>
 </head>
 <body>
-<div id="top" class="screen" style="background:white;align-items:center;justify-content:center;padding:28px 16px;">
+<div id="top" class="screen" style="background:white;align-items:center;justify-content:center;padding:28px 16px;min-height:100vh;">
   <div style="width:100%;max-width:400px;background:#1a3a6b;border-radius:14px;padding:24px 20px;text-align:center;margin-bottom:20px;">
     <div style="font-size:10px;letter-spacing:4px;color:#a8c4e8;margin-bottom:8px;">CITY HOUSE MARUYAMA KITA 3-JO</div>
     <div style="font-size:22px;font-weight:bold;color:white;letter-spacing:2px;">シティハウス円山北3条</div>
@@ -44,7 +44,7 @@ pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;c
     <div style="padding:10px;background:#f4f7fb;border-radius:8px;font-size:13px;color:#666;">デモ用PIN：<strong id="pin-hint" style="color:#1a3a6b;">2039</strong></div>
   </div>
 </div>
-<div id="board" class="screen" style="background:#f4f7fb;flex-direction:column;">
+<div id="board" class="screen" style="background:#f4f7fb;flex-direction:column;min-height:100vh;">
   <div style="background:#1a3a6b;padding:16px;display:flex;align-items:center;justify-content:space-between;">
     <div>
       <div style="font-size:10px;color:#a8c4e8;letter-spacing:3px;margin-bottom:3px;">MEMBERS ONLY</div>
