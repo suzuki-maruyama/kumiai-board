@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>シティハウス円山北3条 組合員専用告知板</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -195,7 +198,9 @@ function pinKey(idx,e){
 }
 
 function buildBoard(){
+  console.log("buildBoard called, NOTICES:", NOTICES.length);
   var list=document.getElementById("notice-list");
+  if(!list){console.log("notice-list not found!");return;}
   list.innerHTML="";
 
   if(STATS.total>0){
