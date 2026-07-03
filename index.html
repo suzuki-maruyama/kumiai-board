@@ -173,9 +173,9 @@ function pinInput(idx,val){
         if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
         STATS.today=(STATS.today||0)+1;
         saveAll();
-        if(MODE==="admin"){buildAdmin();show("admin");}else{buildBoard();show("board");}
+        buildBoard();show("board");
       }else{
-        if(MODE==="admin"){buildAdmin();show("admin");}else{buildBoard();show("board");}
+        buildAdmin();show("admin");
       }
     }else{
       document.getElementById("pin-error").style.display="block";
