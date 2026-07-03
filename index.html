@@ -63,6 +63,7 @@ pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;c
   </div>
   <div style="padding:16px;max-width:680px;width:100%;" id="detail-content"></div>
 </div>
+<script src="data.js"></script>
 <script>
 var MODE="member",SELECTED=null,TAB="layer1";
 var STATS={total:0,today:0,lastDate:""};
@@ -72,14 +73,25 @@ var NOTICES=[
 {id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
 title:"重要事項説明会・第21期定期総会　審議要旨",
 summary:"重要事項説明会および第21期定期総会（第1号〜第10号議案）の審議要旨。各議案の論点・発言・採決結果を簡潔にまとめたもの。",
-layer1:"【審議要旨】\n\n内容は告知板にて順次掲載予定です。",
-layer2:"",layer3:""}
+layer1:"loading",layer2:"",layer3:""}
 ,{id:2,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
 title:"重要事項説明会・第21期定期総会　発言記録（全文）",
 summary:"重要事項説明会および第21期定期総会における発言者別の発言記録の全文。",
-layer1:"【発言記録】\n\n内容は告知板にて順次掲載予定です。",
-layer2:"",layer3:""}
+layer1:"loading",layer2:"",layer3:""}
 ];
+// data.jsから本文を読み込む
+function loadData(){
+  if(typeof NOTICE_DATA!=="undefined"){
+    NOTICES[0].layer1=NOTICE_DATA.youshi;
+    NOTICES[1].layer1=NOTICE_DATA.hatsugen;
+  }else{
+    window._dataReady=function(){
+      NOTICES[0].layer1=NOTICE_DATA.youshi;
+      NOTICES[1].layer1=NOTICE_DATA.hatsugen;
+    };
+  }
+}
+loadData();
 
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(function(s){s.style.display="none";});
