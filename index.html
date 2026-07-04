@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>シティハウス円山北3条 組合員専用告知板 v9</title>
+<title>シティハウス円山北3条 組合員専用告知板 v10</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
@@ -184,7 +184,14 @@ function buildBoard(){
     card.appendChild(body);
     var footer=el("div",{style:"background:#f4f7fb;padding:7px 15px;font-size:12px;color:#1a3a6b;font-weight:bold;text-align:right;"},"詳細を読む →");
     card.appendChild(footer);
-    (function(notice){card.addEventListener("click",function(){SELECTED=notice;TAB="layer1";render("detail");});})(n);
+    (function(notice){card.addEventListener("click",function(){
+      var pdfUrl=notice.id===1?"shingi_youshi.pdf":notice.id===2?"hatsugen_kiroku.pdf":null;
+      if(pdfUrl){
+        window.open("https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,"_blank");
+      }else{
+        SELECTED=notice;TAB="layer1";render("detail");
+      }
+    });})(n);
     list.appendChild(card);
   });
   d.appendChild(list);
