@@ -15,7 +15,7 @@ body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
 <script>
 var MODE="member", SELECTED=null, TAB="layer1";
 var STATS={total:0,today:0,lastDate:""};
-try{var _s=localStorage.getItem("ks");if(_s)STATS=JSON.parse(_s);}catch(e){}
+try{var _s=localStorage.getItem("ks2");if(_s)STATS=JSON.parse(_s);}catch(e){}
 
 var NOTICES=[
   {id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
@@ -121,7 +121,7 @@ function buildPin(){
               STATS.total=(STATS.total||0)+1;
               if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
               STATS.today=(STATS.today||0)+1;
-              try{localStorage.setItem("ks",JSON.stringify(STATS));}catch(e){}
+              try{localStorage.setItem("ks2",JSON.stringify(STATS));}catch(e){}
             }
             render("board");
           }else{
