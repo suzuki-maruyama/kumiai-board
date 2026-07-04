@@ -252,12 +252,21 @@ function buildPdfView(){
   hdr.appendChild(el("span",{style:"color:white;font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"},n.title));
   d.appendChild(hdr);
   var frameWrap=el("div",{style:"flex:1;position:relative;background:#525659;"});
-  var frame=el("iframe",{src:pdfUrl,style:"position:absolute;top:0;left:0;width:100%;height:100%;border:none;",title:n.title});
+  var fullPdfUrl="https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl;
+  var isLine=/Line/i.test(navigator.userAgent);
+  var viewerSrc=isLine?("https://docs.google.com/gview?embedded=true&url="+encodeURIComponent(fullPdfUrl)):pdfUrl;
+  var frame=el("iframe",{src:viewerSrc,style:"position:absolute;top:0;left:0;width:100%;height:100%;border:none;background:white;",title:n.title});
   frameWrap.appendChild(frame);
   d.appendChild(frameWrap);
-  d.appendChild(el("div",{style:"text-align:center;padding:8px;font-size:11px;color:#888;background:#f4f7fb;flex-shrink:0;"},
-    "PDFが表示されない場合は<a href='"+pdfUrl+"' target='_blank' style='color:#1a3a6b;font-weight:bold;'>こちらを直接開く</a>"
-  ));
+  if(isLine){
+    d.appendChild(el("div",{style:"text-align:center;padding:8px;font-size:11px;color:#888;background:#f4f7fb;flex-shrink:0;"},
+      "表示されない場合は右下の「⋮」メニューから<strong>「他のアプリで開く」または「Safariで開く」</strong>を選択してください。&nbsp;<a href='"+fullPdfUrl+"' target='_blank' style='color:#1a3a6b;font-weight:bold;'>直接開く</a>"
+    ));
+  }else{
+    d.appendChild(el("div",{style:"text-align:center;padding:8px;font-size:11px;color:#888;background:#f4f7fb;flex-shrink:0;"},
+      "PDFが表示されない場合は<a href='"+pdfUrl+"' target='_blank' style='color:#1a3a6b;font-weight:bold;'>こちらを直接開く</a>"
+    ));
+  }
   return d;
 }
 
