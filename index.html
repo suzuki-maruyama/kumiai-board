@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>シティハウス円山北3条 組合員専用告知板 v8</title>
+<title>シティハウス円山北3条 組合員専用告知板 v9</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
@@ -206,6 +206,14 @@ function buildDetail(){
   var body=el("div",{style:"padding:16px;max-width:680px;width:100%;"});
   body.appendChild(el("h1",{style:"font-size:17px;color:#1a3a6b;margin:0 0 10px;line-height:1.6;font-weight:bold;"},n.title));
   body.appendChild(el("p",{style:"font-size:13px;color:#555;margin:0 0 14px;"},n.date+" | "+n.tag));
+  // PDFボタンをタイトル直下に配置
+  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
+  if(pdfUrl){
+    var pdfBtn=el("a",{href:"https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,target:"_blank",
+      style:"display:block;text-align:center;background:#b91c1c;color:white;padding:16px;border-radius:10px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:16px;box-shadow:0 4px 12px rgba(185,28,28,0.3);"},
+      "📄 PDFをダウンロード・閲覧する");
+    body.appendChild(pdfBtn);
+  }
   var tabs=[{k:"layer1",l:"📋 事実",c:"#1a3a6b",bg:"#eef3fb"},{k:"layer2",l:"🔍 分析",c:"#166534",bg:"#f0fdf4"},{k:"layer3",l:"💬 問いかけ",c:"#92400e",bg:"#fff7e6"}];
   var tabRow=el("div",{style:"display:flex;border-radius:8px 8px 0 0;overflow:hidden;border:1px solid #dce4f0;border-bottom:none;"});
   tabs.forEach(function(t,i){
@@ -218,14 +226,6 @@ function buildDetail(){
   var box=el("div",{style:"background:"+ct.bg+";border:1px solid #dce4f0;border-top:none;border-radius:0 0 8px 8px;padding:14px;margin-bottom:12px;"});
   var pre=el("pre",{style:"white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;color:#222;"},(n[TAB]||"").replace(/\\n/g,"\n"));
   box.appendChild(pre);body.appendChild(box);
-  // PDFダウンロードボタン
-  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
-  if(pdfUrl){
-    var pdfBtn=el("a",{href:"https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,target:"_blank",
-      style:"display:block;text-align:center;background:#b91c1c;color:white;padding:14px;border-radius:10px;font-size:15px;font-weight:bold;text-decoration:none;margin-bottom:12px;"},
-      "📄 PDFをダウンロード・閲覧する");
-    body.appendChild(pdfBtn);
-  }
   body.appendChild(el("div",{style:"padding:10px 12px;background:#eef3fb;border-radius:8px;border-left:4px solid #1a3a6b;font-size:12px;color:#1a3a6b;font-weight:bold;"},
     "📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。管理組合の公式見解ではありません。"
   ));
