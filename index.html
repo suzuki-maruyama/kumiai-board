@@ -50,6 +50,7 @@ function render(screenId){
   else if(screenId==="pin") app.appendChild(buildPin());
   else if(screenId==="board") app.appendChild(buildBoard());
   else if(screenId==="detail") app.appendChild(buildDetail());
+  else if(screenId==="pdfview") app.appendChild(buildPdfView());
   window.scrollTo(0,0);
 }
 
@@ -187,7 +188,7 @@ function buildBoard(){
     (function(notice){card.addEventListener("click",function(){
       var pdfUrl=notice.id===1?"shingi_youshi.pdf":notice.id===2?"hatsugen_kiroku.pdf":null;
       if(pdfUrl){
-        window.open("https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,"_blank");
+        SELECTED=notice;render("pdfview");
       }else{
         SELECTED=notice;TAB="layer1";render("detail");
       }
@@ -216,9 +217,9 @@ function buildDetail(){
   // PDFボタンをタイトル直下に配置
   var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
   if(pdfUrl){
-    var pdfBtn=el("a",{href:"https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,target:"_blank",
-      style:"display:block;text-align:center;background:#b91c1c;color:white;padding:16px;border-radius:10px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:16px;box-shadow:0 4px 12px rgba(185,28,28,0.3);"},
-      "📄 PDFをダウンロード・閲覧する");
+    var pdfBtn=el("button",{style:"display:block;width:100%;text-align:center;background:#b91c1c;color:white;padding:16px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-bottom:16px;box-shadow:0 4px 12px rgba(185,28,28,0.3);"},
+      "📄 PDFを表示する");
+    pdfBtn.addEventListener("click",function(){render("pdfview");});
     body.appendChild(pdfBtn);
   }
   var tabs=[{k:"layer1",l:"📋 事実",c:"#1a3a6b",bg:"#eef3fb"},{k:"layer2",l:"🔍 分析",c:"#166534",bg:"#f0fdf4"},{k:"layer3",l:"💬 問いかけ",c:"#92400e",bg:"#fff7e6"}];
@@ -237,6 +238,26 @@ function buildDetail(){
     "📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。管理組合の公式見解ではありません。"
   ));
   d.appendChild(body);
+  return d;
+}
+
+function buildPdfView(){
+  var n=SELECTED;
+  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
+  var d=el("div",{style:"height:100vh;background:#f4f7fb;display:flex;flex-direction:column;overflow:hidden;"});
+  var hdr=el("div",{style:"background:#1a3a6b;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;"});
+  var back=el("button",{style:"background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;flex-shrink:0;white-space:nowrap;"},"← 一覧へ");
+  back.addEventListener("click",function(){render("board");});
+  hdr.appendChild(back);
+  hdr.appendChild(el("span",{style:"color:white;font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"},n.title));
+  d.appendChild(hdr);
+  var frameWrap=el("div",{style:"flex:1;position:relative;background:#525659;"});
+  var frame=el("iframe",{src:pdfUrl,style:"position:absolute;top:0;left:0;width:100%;height:100%;border:none;",title:n.title});
+  frameWrap.appendChild(frame);
+  d.appendChild(frameWrap);
+  d.appendChild(el("div",{style:"text-align:center;padding:8px;font-size:11px;color:#888;background:#f4f7fb;flex-shrink:0;"},
+    "PDFが表示されない場合は<a href='"+pdfUrl+"' target='_blank' style='color:#1a3a6b;font-weight:bold;'>こちらを直接開く</a>"
+  ));
   return d;
 }
 
