@@ -6,81 +6,28 @@
 <title>シティハウス円山北3条 組合員専用告知板</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#f4f7fb;font-family:sans-serif;}
-.screen{display:none;}
-.notice-card{background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
-.notice-footer{background:#f4f7fb;padding:7px 15px;font-size:12px;color:#1a3a6b;font-weight:bold;text-align:right;}
-pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;color:#222;}
+body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
 </style>
 </head>
 <body>
-<div id="top" class="screen" style="background:#f4f7fb;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;">
-  <div style="width:100%;max-width:400px;">
-    <div style="background:#1a3a6b;border-radius:14px;padding:28px 24px;text-align:center;margin-bottom:20px;box-shadow:0 4px 20px rgba(26,58,107,0.25);">
-      <div style="font-size:10px;letter-spacing:4px;color:#a8c4e8;font-family:sans-serif;margin-bottom:10px;">CITY HOUSE MARUYAMA KITA 3-JO</div>
-      <div style="font-size:24px;font-weight:bold;color:white;letter-spacing:2px;line-height:1.4;margin-bottom:6px;">シティハウス円山北3条</div>
-      <div style="font-size:14px;color:#c8dcf4;letter-spacing:1px;">管理組合　組合員専用告知板</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-      <button onclick="goPin('member')" style="background:#1a3a6b;color:white;font-size:17px;font-weight:bold;padding:18px;border:none;border-radius:12px;cursor:pointer;font-family:sans-serif;box-shadow:0 4px 14px rgba(26,58,107,0.3);">🔒　組合員ページを閲覧する</button>
-      <button onclick="goPin('admin')" style="background:white;border:2px solid #1a3a6b;color:#1a3a6b;font-size:14px;font-weight:bold;padding:14px;border-radius:12px;cursor:pointer;font-family:sans-serif;">🔑　管理者ログイン</button>
-    </div>
-    <div style="padding:14px 16px;background:#fffbeb;border:2px solid #d97706;border-radius:10px;font-size:12px;color:#78350f;line-height:1.9;font-family:sans-serif;">
-      <strong>📋 このページについて</strong><br>本ページは203号室　鈴木章三郎が個人の立場から公開情報に基づき作成したものです。管理組合の公式見解ではありません。
-    </div>
-  </div>
-</div>
-<div id="pin" class="screen" style="display:none;background:#f4f7fb;align-items:center;justify-content:center;padding:20px;">
-  <button onclick="showScreen('top')" style="position:fixed;top:20px;left:20px;background:white;border:2px solid #1a3a6b;color:#1a3a6b;border-radius:10px;padding:10px 18px;font-size:14px;cursor:pointer;">← 戻る</button>
-  <div style="width:100%;max-width:360px;background:white;border-radius:18px;padding:36px 28px;box-shadow:0 4px 32px rgba(0,0,0,0.10);text-align:center;">
-    <div style="font-size:44px;margin-bottom:16px;" id="pin-icon">🔒</div>
-    <div style="font-size:20px;font-weight:bold;color:#1a3a6b;margin-bottom:8px;">暗証番号を入力</div>
-    <div style="font-size:13px;color:#555;margin-bottom:24px;">4桁の暗証番号を入力してください</div>
-    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
-      <input id="p0" type="tel" maxlength="1" oninput="pi(0,this.value)" onkeydown="pk(0,event)" style="width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;">
-      <input id="p1" type="tel" maxlength="1" oninput="pi(1,this.value)" onkeydown="pk(1,event)" style="width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;">
-      <input id="p2" type="tel" maxlength="1" oninput="pi(2,this.value)" onkeydown="pk(2,event)" style="width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;">
-      <input id="p3" type="tel" maxlength="1" oninput="pi(3,this.value)" onkeydown="pk(3,event)" style="width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;">
-    </div>
-    <div id="pin-error" style="display:none;padding:10px;background:#fef2f2;border:2px solid #b91c1c;border-radius:8px;color:#b91c1c;font-size:13px;margin-bottom:12px;">暗証番号が違います</div>
-
-  </div>
-</div>
-<div id="board" class="screen" style="display:none;background:#f4f7fb;flex-direction:column;min-height:100vh;">
-  <div style="background:#1a3a6b;padding:16px;display:flex;align-items:center;justify-content:space-between;">
-    <div>
-      <div style="font-size:10px;color:#a8c4e8;letter-spacing:3px;margin-bottom:3px;">MEMBERS ONLY</div>
-      <div style="font-size:18px;font-weight:bold;color:white;">組合員専用告知板</div>
-      <div style="font-size:12px;color:#c8dcf4;">シティハウス円山北3条　管理組合</div>
-    </div>
-    <button onclick="showScreen('top')" style="background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 12px;font-size:12px;cursor:pointer;">ログアウト</button>
-  </div>
-  <div style="padding:14px;" id="notice-list"></div>
-  <div style="text-align:center;padding:16px;border-top:1px solid #dce4f0;font-size:11px;color:#888;line-height:1.9;">本ページは203号室　鈴木章三郎が個人の立場から作成したものです。管理組合の公式見解ではありません。</div>
-</div>
-<div id="detail" class="screen" style="display:none;background:#f4f7fb;flex-direction:column;">
-  <div style="background:#1a3a6b;padding:12px 16px;display:flex;align-items:center;gap:10px;">
-    <button onclick="showScreen('board')" style="background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;">← 一覧へ</button>
-    <span style="color:#c8dcf4;font-size:12px;">シティハウス円山北3条</span>
-  </div>
-  <div style="padding:16px;max-width:680px;width:100%;" id="detail-content"></div>
-</div>
+<div id="app"></div>
 <script src="data.js"></script>
 <script>
-var MODE="member",SELECTED=null,TAB="layer1";
+var MODE="member", SELECTED=null, TAB="layer1";
 var STATS={total:0,today:0,lastDate:""};
 try{var _s=localStorage.getItem("ks");if(_s)STATS=JSON.parse(_s);}catch(e){}
 
 var NOTICES=[
-{id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
-title:"重要事項説明会・第21期定期総会　審議要旨",
-summary:"重要事項説明会および第21期定期総会（第1号〜第10号議案）の審議要旨。各議案の論点・発言・採決結果を簡潔にまとめたもの。",
-layer1:"loading",layer2:"",layer3:""}
-,{id:2,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
-title:"重要事項説明会・第21期定期総会　発言記録（全文）",
-summary:"重要事項説明会および第21期定期総会における発言者別の発言記録の全文。",
-layer1:"loading",layer2:"",layer3:""}
+  {id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
+   title:"重要事項説明会・第21期定期総会　審議要旨",
+   summary:"重要事項説明会および第21期定期総会（第1号〜第10号議案）の審議要旨。各議案の論点・発言・採決結果を簡潔にまとめたもの。",
+   layer1:"loading",layer2:"",layer3:""}
+ ,{id:2,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
+   title:"重要事項説明会・第21期定期総会　発言記録（全文）",
+   summary:"重要事項説明会および第21期定期総会における発言者別の発言記録の全文。",
+   layer1:"loading",layer2:"",layer3:""}
 ];
+
 // data.jsから本文を読み込む
 function loadData(){
   if(typeof NOTICE_DATA!=="undefined"){
@@ -95,95 +42,189 @@ function loadData(){
 }
 loadData();
 
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(function(s){s.style.display="none";});
-  var el=document.getElementById(id);
-  var flexDir=el.style.flexDirection||"";
-  el.style.display="flex";
-  if(flexDir)el.style.flexDirection=flexDir;
+function render(screenId){
+  var app=document.getElementById("app");
+  app.innerHTML="";
+  if(screenId==="top") app.appendChild(buildTop());
+  else if(screenId==="pin") app.appendChild(buildPin());
+  else if(screenId==="board") app.appendChild(buildBoard());
+  else if(screenId==="detail") app.appendChild(buildDetail());
   window.scrollTo(0,0);
 }
-function goPin(mode){
-  MODE=mode;
-  document.getElementById("pin-icon").textContent=mode==="admin"?"🔑":"🔒";
-  document.getElementById("pin-hint").textContent=mode==="admin"?"9999":"2039";
-  ["p0","p1","p2","p3"].forEach(function(id){document.getElementById(id).value="";});
-  document.getElementById("pin-error").style.display="none";
-  showScreen("pin");
-  setTimeout(function(){document.getElementById("p0").focus();},100);
+
+function el(tag,attrs,html){
+  var e=document.createElement(tag);
+  if(attrs)Object.keys(attrs).forEach(function(k){
+    if(k==="style")e.style.cssText=attrs[k];
+    else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);
+    else e.setAttribute(k,attrs[k]);
+  });
+  if(html!==undefined)e.innerHTML=html;
+  return e;
 }
-function pi(idx,val){
-  val=val.replace(/[^0-9]/g,"").slice(-1);
-  document.getElementById("p"+idx).value=val;
-  if(val&&idx<3)document.getElementById("p"+(idx+1)).focus();
-  var pins=["p0","p1","p2","p3"].map(function(id){return document.getElementById(id).value;});
-  if(pins.every(function(p){return p!==""})){
-    var entered=pins.join("");
-    var ok=(MODE==="member"&&entered==="2039")||(MODE==="admin"&&entered==="9999");
-    if(ok){
-      if(MODE==="member"){
-        var today=new Date().toLocaleDateString("ja-JP");
-        STATS.total=(STATS.total||0)+1;
-        if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
-        STATS.today=(STATS.today||0)+1;
-        try{localStorage.setItem("ks",JSON.stringify(STATS));}catch(e){}
-        buildBoard();showScreen("board");
-      }else{showScreen("board");}
-    }else{
-      document.getElementById("pin-error").style.display="block";
-      setTimeout(function(){
-        ["p0","p1","p2","p3"].forEach(function(id){document.getElementById(id).value="";});
-        document.getElementById("pin-error").style.display="none";
-        document.getElementById("p0").focus();
-      },700);
-    }
-  }
+
+function buildTop(){
+  var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;"});
+  var inner=el("div",{style:"width:100%;max-width:400px;"});
+  inner.appendChild(el("div",{style:"background:#1a3a6b;border-radius:14px;padding:28px 24px;text-align:center;margin-bottom:20px;box-shadow:0 4px 20px rgba(26,58,107,0.25);"},
+    "<div style='font-size:10px;letter-spacing:4px;color:#a8c4e8;margin-bottom:10px;'>CITY HOUSE MARUYAMA KITA 3-JO</div>"+
+    "<div style='font-size:24px;font-weight:bold;color:white;letter-spacing:2px;line-height:1.4;margin-bottom:6px;'>シティハウス円山北3条</div>"+
+    "<div style='font-size:14px;color:#c8dcf4;'>管理組合　組合員専用告知板</div>"
+  ));
+  var btns=el("div",{style:"display:flex;flex-direction:column;gap:12px;margin-bottom:16px;"});
+  var b1=el("button",{style:"background:#1a3a6b;color:white;font-size:17px;font-weight:bold;padding:18px;border:none;border-radius:12px;cursor:pointer;"},"🔒　組合員ページを閲覧する");
+  b1.addEventListener("click",function(){MODE="member";render("pin");});
+  var b2=el("button",{style:"background:white;border:2px solid #1a3a6b;color:#1a3a6b;font-size:14px;font-weight:bold;padding:14px;border-radius:12px;cursor:pointer;"},"🔑　管理者ログイン");
+  b2.addEventListener("click",function(){MODE="admin";render("pin");});
+  btns.appendChild(b1);btns.appendChild(b2);
+  inner.appendChild(btns);
+  inner.appendChild(el("div",{style:"padding:14px 16px;background:#fffbeb;border:2px solid #d97706;border-radius:10px;font-size:12px;color:#78350f;line-height:1.9;"},
+    "<strong>📋 このページについて</strong><br>本ページは203号室　鈴木章三郎が個人の立場から公開情報に基づき作成したものです。管理組合の公式見解ではありません。"
+  ));
+  d.appendChild(inner);
+  return d;
 }
-function pk(idx,e){if(e.key==="Backspace"&&!document.getElementById("p"+idx).value&&idx>0)document.getElementById("p"+(idx-1)).focus();}
+
+function buildPin(){
+  var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;align-items:center;justify-content:center;padding:20px;"});
+  var back=el("button",{style:"position:fixed;top:20px;left:20px;background:white;border:2px solid #1a3a6b;color:#1a3a6b;border-radius:10px;padding:10px 18px;font-size:14px;cursor:pointer;"},"← 戻る");
+  back.addEventListener("click",function(){render("top");});
+  d.appendChild(back);
+  var card=el("div",{style:"width:100%;max-width:360px;background:white;border-radius:18px;padding:36px 28px;box-shadow:0 4px 32px rgba(0,0,0,0.10);text-align:center;"});
+  card.innerHTML=
+    "<div style='font-size:44px;margin-bottom:16px;'>"+(MODE==="admin"?"🔑":"🔒")+"</div>"+
+    "<div style='font-size:20px;font-weight:bold;color:#1a3a6b;margin-bottom:8px;'>暗証番号を入力</div>"+
+    "<div style='font-size:13px;color:#555;margin-bottom:24px;'>4桁の暗証番号を入力してください</div>"+
+    "<div style='display:flex;gap:12px;justify-content:center;margin-bottom:16px;'>"+
+    "<input id='p0' type='tel' maxlength='1' style='width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;'>"+
+    "<input id='p1' type='tel' maxlength='1' style='width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;'>"+
+    "<input id='p2' type='tel' maxlength='1' style='width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;'>"+
+    "<input id='p3' type='tel' maxlength='1' style='width:56px;height:68px;text-align:center;font-size:28px;font-weight:bold;border-radius:10px;border:3px solid #d0d0d0;color:#1a3a6b;background:#f5f5f5;'>"+
+    "</div>"+
+    "<div id='pin-err' style='display:none;padding:10px;background:#fef2f2;border:2px solid #b91c1c;border-radius:8px;color:#b91c1c;font-size:13px;margin-bottom:12px;'>暗証番号が違います</div>";
+  d.appendChild(card);
+  setTimeout(function(){
+    ["p0","p1","p2","p3"].forEach(function(id,i){
+      var inp=document.getElementById(id);
+      if(!inp)return;
+      inp.addEventListener("input",function(){
+        var v=this.value.replace(/[^0-9]/g,"").slice(-1);
+        this.value=v;
+        if(v&&i<3)document.getElementById("p"+(i+1)).focus();
+        var pins=["p0","p1","p2","p3"].map(function(x){return(document.getElementById(x)||{value:""}).value;});
+        if(pins.every(function(p){return p!==""})){
+          var entered=pins.join("");
+          var ok=(MODE==="member"&&entered==="2039")||(MODE==="admin"&&entered==="9999");
+          if(ok){
+            if(MODE==="member"){
+              var today=new Date().toLocaleDateString("ja-JP");
+              STATS.total=(STATS.total||0)+1;
+              if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
+              STATS.today=(STATS.today||0)+1;
+              try{localStorage.setItem("ks",JSON.stringify(STATS));}catch(e){}
+            }
+            render("board");
+          }else{
+            var err=document.getElementById("pin-err");
+            if(err)err.style.display="block";
+            setTimeout(function(){
+              ["p0","p1","p2","p3"].forEach(function(x){var e=document.getElementById(x);if(e)e.value="";});
+              var err2=document.getElementById("pin-err");
+              if(err2)err2.style.display="none";
+              var p=document.getElementById("p0");if(p)p.focus();
+            },700);
+          }
+        }
+      });
+      inp.addEventListener("keydown",function(e){
+        if(e.key==="Backspace"&&!this.value&&i>0)document.getElementById("p"+(i-1)).focus();
+      });
+    });
+    var p0=document.getElementById("p0");if(p0)p0.focus();
+  },100);
+  return d;
+}
+
 function buildBoard(){
-  var list=document.getElementById("notice-list");
-  list.innerHTML="";
+  var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;flex-direction:column;"});
+  var hdr=el("div",{style:"background:#1a3a6b;padding:16px;"});
+  hdr.innerHTML="<div style='display:flex;align-items:center;justify-content:space-between;'>"+
+    "<div><div style='font-size:10px;color:#a8c4e8;letter-spacing:3px;margin-bottom:3px;'>MEMBERS ONLY</div>"+
+    "<div style='font-size:18px;font-weight:bold;color:white;'>組合員専用告知板</div>"+
+    "<div style='font-size:12px;color:#c8dcf4;'>シティハウス円山北3条　管理組合</div></div>"+
+    "<button id='logout-btn' style='background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 12px;font-size:12px;cursor:pointer;'>ログアウト</button></div>";
+  d.appendChild(hdr);
+  setTimeout(function(){
+    var lb=document.getElementById("logout-btn");
+    if(lb)lb.addEventListener("click",function(){render("top");});
+  },50);
+  var list=el("div",{style:"padding:14px;"});
   if(STATS.total>0){
-    var bar=document.createElement("div");
-    bar.style.cssText="background:white;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);";
-    bar.innerHTML="<div style='font-size:14px;font-weight:bold;color:#1a3a6b;margin-bottom:10px;'>📊 組合員の関心バロメーター</div><div style='display:flex;gap:10px;'><div style='flex:1;background:#eef3fb;border-radius:8px;padding:10px;text-align:center;border:1px solid #1a3a6b;'><div style='font-size:11px;color:#1a3a6b;font-weight:bold;'>累計アクセス</div><div style='font-size:32px;font-weight:bold;color:#1a3a6b;'>"+STATS.total+"</div><div style='font-size:10px;color:#888;'>回</div></div><div style='flex:1;background:#fff7e6;border-radius:8px;padding:10px;text-align:center;border:1px solid #d97706;'><div style='font-size:11px;color:#92400e;font-weight:bold;'>本日</div><div style='font-size:32px;font-weight:bold;color:#d97706;'>"+STATS.today+"</div><div style='font-size:10px;color:#888;'>回</div></div></div>";
-    list.appendChild(bar);
+    list.innerHTML+="<div style='background:white;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);'>"+
+      "<div style='font-size:14px;font-weight:bold;color:#1a3a6b;margin-bottom:10px;'>📊 組合員の関心バロメーター</div>"+
+      "<div style='display:flex;gap:10px;'>"+
+      "<div style='flex:1;background:#eef3fb;border-radius:8px;padding:10px;text-align:center;border:1px solid #1a3a6b;'><div style='font-size:11px;color:#1a3a6b;font-weight:bold;'>累計アクセス</div><div style='font-size:32px;font-weight:bold;color:#1a3a6b;'>"+STATS.total+"</div><div style='font-size:10px;color:#888;'>回</div></div>"+
+      "<div style='flex:1;background:#fff7e6;border-radius:8px;padding:10px;text-align:center;border:1px solid #d97706;'><div style='font-size:11px;color:#92400e;font-weight:bold;'>本日</div><div style='font-size:32px;font-weight:bold;color:#d97706;'>"+STATS.today+"</div><div style='font-size:10px;color:#888;'>回</div></div>"+
+      "</div></div>";
   }
-  NOTICES.slice().sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||b.id-a.id;}).forEach(function(n){
-    var card=document.createElement("div");
-    card.className="notice-card";
-    card.style.borderLeft="5px solid "+n.color;
-    var body=document.createElement("div");
-    body.style.padding="13px 15px";
-    var hdr=document.createElement("div");
-    hdr.style.cssText="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap;";
-    var cat=document.createElement("span");
-    cat.style.cssText="background:"+n.color+";color:white;font-size:11px;font-weight:bold;padding:2px 9px;border-radius:4px;";
-    cat.textContent=n.category;hdr.appendChild(cat);
-    if(n.pinned){var pin=document.createElement("span");pin.style.cssText="background:#fff7e6;border:1px solid #d97706;color:#92400e;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:bold;";pin.textContent="📌 重要";hdr.appendChild(pin);}
-    var dt=document.createElement("span");dt.style.cssText="font-size:11px;color:#666;";dt.textContent=n.date;hdr.appendChild(dt);
-    body.appendChild(hdr);
-    var title=document.createElement("h3");title.style.cssText="margin:0 0 4px;font-size:14px;color:#1a3a6b;line-height:1.5;font-weight:bold;";title.textContent=n.title;body.appendChild(title);
-    var summ=document.createElement("p");summ.style.cssText="margin:0;font-size:12px;color:#555;line-height:1.6;";summ.textContent=n.summary;body.appendChild(summ);
+  NOTICES.slice().sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||b.id-a.id;}).forEach(function(n,idx){
+    var card=el("div",{style:"background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border-left:5px solid "+n.color+";"});
+    var body=el("div",{style:"padding:13px 15px;"});
+    var hdrRow=el("div",{style:"display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap;"});
+    var cat=el("span",{style:"background:"+n.color+";color:white;font-size:11px;font-weight:bold;padding:2px 9px;border-radius:4px;"},n.category);
+    hdrRow.appendChild(cat);
+    if(n.pinned){var pin=el("span",{style:"background:#fff7e6;border:1px solid #d97706;color:#92400e;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:bold;"},"📌 重要");hdrRow.appendChild(pin);}
+    var dt=el("span",{style:"font-size:11px;color:#666;"},n.date);hdrRow.appendChild(dt);
+    body.appendChild(hdrRow);
+    var title=el("h3",{style:"margin:0 0 4px;font-size:14px;color:#1a3a6b;line-height:1.5;font-weight:bold;"},n.title);
+    body.appendChild(title);
+    var summ=el("p",{style:"margin:0;font-size:12px;color:#555;line-height:1.6;"},n.summary);
+    body.appendChild(summ);
     card.appendChild(body);
-    var footer=document.createElement("div");footer.className="notice-footer";footer.textContent="詳細を読む →";card.appendChild(footer);
-    card.addEventListener("click",function(){SELECTED=n;TAB="layer1";buildDetail();showScreen("detail");});
+    var footer=el("div",{style:"background:#f4f7fb;padding:7px 15px;font-size:12px;color:#1a3a6b;font-weight:bold;text-align:right;"},"詳細を読む →");
+    card.appendChild(footer);
+    (function(notice){card.addEventListener("click",function(){SELECTED=notice;TAB="layer1";render("detail");});})(n);
     list.appendChild(card);
   });
+  d.appendChild(list);
+  d.appendChild(el("div",{style:"text-align:center;padding:16px;border-top:1px solid #dce4f0;font-size:11px;color:#888;line-height:1.9;"},
+    "本ページは203号室　鈴木章三郎が個人の立場から作成したものです。<br>管理組合の公式見解ではありません。"
+  ));
+  return d;
 }
+
 function buildDetail(){
   var n=SELECTED;
-  var c=document.getElementById("detail-content");
-  c.innerHTML="";
-  var h1=document.createElement("h1");h1.style.cssText="font-size:17px;color:#1a3a6b;margin:0 0 10px;line-height:1.6;font-weight:bold;";h1.textContent=n.title;c.appendChild(h1);
-  var pre=document.createElement("pre");
-  pre.textContent=(n.layer1||"").replace(/\n/g,"\n");
-  var box=document.createElement("div");box.style.cssText="background:#eef3fb;border-radius:8px;padding:14px;margin-bottom:12px;";
-  box.appendChild(pre);c.appendChild(box);
-  var foot=document.createElement("div");foot.style.cssText="padding:10px 12px;background:#eef3fb;border-radius:8px;border-left:4px solid #1a3a6b;font-size:12px;color:#1a3a6b;font-weight:bold;";
-  foot.textContent="📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。";c.appendChild(foot);
+  var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;flex-direction:column;"});
+  var hdr=el("div",{style:"background:#1a3a6b;padding:12px 16px;display:flex;align-items:center;gap:10px;"});
+  var back=el("button",{style:"background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;"},"← 一覧へ");
+  back.addEventListener("click",function(){render("board");});
+  hdr.appendChild(back);
+  hdr.appendChild(el("span",{style:"color:#c8dcf4;font-size:12px;"},"シティハウス円山北3条"));
+  d.appendChild(hdr);
+  var body=el("div",{style:"padding:16px;max-width:680px;width:100%;"});
+  body.appendChild(el("h1",{style:"font-size:17px;color:#1a3a6b;margin:0 0 10px;line-height:1.6;font-weight:bold;"},n.title));
+  body.appendChild(el("p",{style:"font-size:13px;color:#555;margin:0 0 14px;"},n.date+" | "+n.tag));
+  var tabs=[{k:"layer1",l:"📋 事実",c:"#1a3a6b",bg:"#eef3fb"},{k:"layer2",l:"🔍 分析",c:"#166534",bg:"#f0fdf4"},{k:"layer3",l:"💬 問いかけ",c:"#92400e",bg:"#fff7e6"}];
+  var tabRow=el("div",{style:"display:flex;border-radius:8px 8px 0 0;overflow:hidden;border:1px solid #dce4f0;border-bottom:none;"});
+  tabs.forEach(function(t,i){
+    var btn=el("button",{style:"flex:1;padding:8px 3px;border:none;cursor:pointer;font-size:11px;"+(i<2?"border-right:1px solid #dce4f0;":"")+"background:"+(TAB===t.k?t.bg:"#f4f7fb")+";color:"+(TAB===t.k?t.c:"#888")+";font-weight:"+(TAB===t.k?"bold":"normal")+";"},t.l);
+    (function(key){btn.addEventListener("click",function(){TAB=key;render("detail");});})(t.k);
+    tabRow.appendChild(btn);
+  });
+  body.appendChild(tabRow);
+  var ct=tabs.find(function(t){return t.k===TAB;});
+  var box=el("div",{style:"background:"+ct.bg+";border:1px solid #dce4f0;border-top:none;border-radius:0 0 8px 8px;padding:14px;margin-bottom:12px;"});
+  var pre=el("pre",{style:"white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;color:#222;"},(n[TAB]||"").replace(/\\n/g,"\n"));
+  box.appendChild(pre);body.appendChild(box);
+  body.appendChild(el("div",{style:"padding:10px 12px;background:#eef3fb;border-radius:8px;border-left:4px solid #1a3a6b;font-size:12px;color:#1a3a6b;font-weight:bold;"},
+    "📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。管理組合の公式見解ではありません。"
+  ));
+  d.appendChild(body);
+  return d;
 }
-showScreen('top');
+
+render("top");
 </script>
 </body>
 </html>
