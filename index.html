@@ -217,6 +217,14 @@ function buildDetail(){
   var box=el("div",{style:"background:"+ct.bg+";border:1px solid #dce4f0;border-top:none;border-radius:0 0 8px 8px;padding:14px;margin-bottom:12px;"});
   var pre=el("pre",{style:"white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;color:#222;"},(n[TAB]||"").replace(/\\n/g,"\n"));
   box.appendChild(pre);body.appendChild(box);
+  // PDFダウンロードボタン
+  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
+  if(pdfUrl){
+    var pdfBtn=el("a",{href:"https://suzuki-maruyama.github.io/kumiai-board/"+pdfUrl,target:"_blank",
+      style:"display:block;text-align:center;background:#b91c1c;color:white;padding:14px;border-radius:10px;font-size:15px;font-weight:bold;text-decoration:none;margin-bottom:12px;"},
+      "📄 PDFをダウンロード・閲覧する");
+    body.appendChild(pdfBtn);
+  }
   body.appendChild(el("div",{style:"padding:10px 12px;background:#eef3fb;border-radius:8px;border-left:4px solid #1a3a6b;font-size:12px;color:#1a3a6b;font-weight:bold;"},
     "📌 本ページは203号室　鈴木章三郎（個人）が公開情報に基づき作成したものです。管理組合の公式見解ではありません。"
   ));
