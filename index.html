@@ -30,7 +30,7 @@ pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;c
     </div>
   </div>
 </div>
-<div id="pin" class="screen" style="background:#f4f7fb;align-items:center;justify-content:center;padding:20px;">
+<div id="pin" class="screen" style="display:none;background:#f4f7fb;align-items:center;justify-content:center;padding:20px;">
   <button onclick="showScreen('top')" style="position:fixed;top:20px;left:20px;background:white;border:2px solid #1a3a6b;color:#1a3a6b;border-radius:10px;padding:10px 18px;font-size:14px;cursor:pointer;">← 戻る</button>
   <div style="width:100%;max-width:360px;background:white;border-radius:18px;padding:36px 28px;box-shadow:0 4px 32px rgba(0,0,0,0.10);text-align:center;">
     <div style="font-size:44px;margin-bottom:16px;" id="pin-icon">🔒</div>
@@ -46,7 +46,7 @@ pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;c
 
   </div>
 </div>
-<div id="board" class="screen" style="background:#f4f7fb;flex-direction:column;min-height:100vh;">
+<div id="board" class="screen" style="display:none;background:#f4f7fb;flex-direction:column;min-height:100vh;">
   <div style="background:#1a3a6b;padding:16px;display:flex;align-items:center;justify-content:space-between;">
     <div>
       <div style="font-size:10px;color:#a8c4e8;letter-spacing:3px;margin-bottom:3px;">MEMBERS ONLY</div>
@@ -58,7 +58,7 @@ pre{white-space:pre-wrap;font-family:sans-serif;line-height:1.8;font-size:14px;c
   <div style="padding:14px;" id="notice-list"></div>
   <div style="text-align:center;padding:16px;border-top:1px solid #dce4f0;font-size:11px;color:#888;line-height:1.9;">本ページは203号室　鈴木章三郎が個人の立場から作成したものです。管理組合の公式見解ではありません。</div>
 </div>
-<div id="detail" class="screen" style="background:#f4f7fb;flex-direction:column;">
+<div id="detail" class="screen" style="display:none;background:#f4f7fb;flex-direction:column;">
   <div style="background:#1a3a6b;padding:12px 16px;display:flex;align-items:center;gap:10px;">
     <button onclick="showScreen('board')" style="background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;">← 一覧へ</button>
     <span style="color:#c8dcf4;font-size:12px;">シティハウス円山北3条</span>
@@ -98,7 +98,9 @@ loadData();
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(function(s){s.style.display="none";});
   var el=document.getElementById(id);
+  var flexDir=el.style.flexDirection||"";
   el.style.display="flex";
+  if(flexDir)el.style.flexDirection=flexDir;
   window.scrollTo(0,0);
 }
 function goPin(mode){
