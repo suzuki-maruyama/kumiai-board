@@ -20,13 +20,29 @@ try{var _s=localStorage.getItem("ks2");if(_s)STATS=JSON.parse(_s);}catch(e){}
 
 var NOTICES=[
   {id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
-   title:"重要事項説明会・第21期定期総会　審議要旨",
+   title:"No1. 重要事項説明会・第21期定期総会　審議要旨",
    summary:"重要事項説明会および第21期定期総会（第1号〜第10号議案）の審議要旨。各議案の論点・発言・採決結果を簡潔にまとめたもの。",
-   layer1:"loading",layer2:"",layer3:""}
+   pdf:"shingi_youshi.pdf",layer1:"loading",layer2:"",layer3:""}
  ,{id:2,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
-   title:"重要事項説明会・第21期定期総会　発言記録（全文）",
+   title:"No2. 重要事項説明会・第21期定期総会　発言記録（全文）",
    summary:"重要事項説明会および第21期定期総会における発言者別の発言記録の全文。",
-   layer1:"loading",layer2:"",layer3:""}
+   pdf:"hatsugen_kiroku.pdf",layer1:"loading",layer2:"",layer3:""}
+ ,{id:3,category:"重要",color:"#b91c1c",pinned:true,date:"2026年7月8日",tag:"AI評価・助言",
+   title:"No3. 第1回　Claudeによる評価及び助言",
+   summary:"重要事項説明会及び定期総会に関するAI評価・助言資料　その１",
+   pdf:"claude_hyouka.pdf",layer1:"",layer2:"",layer3:""}
+ ,{id:4,category:"重要",color:"#b91c1c",pinned:true,date:"2026年7月8日",tag:"AI評価・助言",
+   title:"No4. 第2回　Geminiによる評価及び助言",
+   summary:"重要事項説明会及び定期総会に関するAI評価・助言資料　その２",
+   pdf:"gemini_hyouka.pdf",layer1:"",layer2:"",layer3:""}
+ ,{id:5,category:"重要",color:"#b91c1c",pinned:true,date:"2026年7月8日",tag:"AI評価・助言",
+   title:"No5. 第3回　ChatGPTによる評価及び助言",
+   summary:"重要事項説明会及び定期総会に関するAI評価・助言資料　その3",
+   pdf:"chatgpt_hyouka.pdf",layer1:"",layer2:"",layer3:""}
+ ,{id:6,category:"重要",color:"#b91c1c",pinned:true,date:"2026年7月8日",tag:"AI評価・助言",
+   title:"No6. 三つのAI評価から見えた共通課題　投書書面",
+   summary:"重要事項説明会及び定期総会に関するAI評価・助言資料　総括",
+   pdf:"sougou_kadai.pdf",layer1:"",layer2:"",layer3:""}
 ];
 
 // data.jsから本文を読み込む
@@ -186,7 +202,7 @@ function buildBoard(){
     var footer=el("div",{style:"background:#f4f7fb;padding:7px 15px;font-size:12px;color:#1a3a6b;font-weight:bold;text-align:right;"},"詳細を読む →");
     card.appendChild(footer);
     (function(notice){card.addEventListener("click",function(){
-      var pdfUrl=notice.id===1?"shingi_youshi.pdf":notice.id===2?"hatsugen_kiroku.pdf":null;
+      var pdfUrl=notice.pdf||null;
       if(pdfUrl){
         SELECTED=notice;render("pdfview");
       }else{
@@ -215,7 +231,7 @@ function buildDetail(){
   body.appendChild(el("h1",{style:"font-size:17px;color:#1a3a6b;margin:0 0 10px;line-height:1.6;font-weight:bold;"},n.title));
   body.appendChild(el("p",{style:"font-size:13px;color:#555;margin:0 0 14px;"},n.date+" | "+n.tag));
   // PDFボタンをタイトル直下に配置
-  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
+  var pdfUrl=n.pdf||null;
   if(pdfUrl){
     var pdfBtn=el("button",{style:"display:block;width:100%;text-align:center;background:#b91c1c;color:white;padding:16px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-bottom:16px;box-shadow:0 4px 12px rgba(185,28,28,0.3);"},
       "📄 PDFを表示する");
@@ -243,7 +259,7 @@ function buildDetail(){
 
 function buildPdfView(){
   var n=SELECTED;
-  var pdfUrl=n.id===1?"shingi_youshi.pdf":n.id===2?"hatsugen_kiroku.pdf":null;
+  var pdfUrl=n.pdf||null;
   var d=el("div",{style:"height:100vh;background:#f4f7fb;display:flex;flex-direction:column;overflow:hidden;"});
   var hdr=el("div",{style:"background:#1a3a6b;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;"});
   var back=el("button",{style:"background:white;border:none;color:#1a3a6b;border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;flex-shrink:0;white-space:nowrap;"},"← 一覧へ");
