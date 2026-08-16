@@ -23,8 +23,6 @@ body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
 var MODE="member", SELECTED=null, TAB="layer1";
 var READLOG_NAMES=["坪田勲","松尾圭子","小野文哉","木村望","境一彦","正村祐紀","管理会社フロント"];
 var READLOG_SELECTED=null;
-var STATS={total:0,today:0,lastDate:""};
-try{var _s=localStorage.getItem("ks2");if(_s)STATS=JSON.parse(_s);}catch(e){}
 
 var NOTICES=[
   {id:1,category:"重要",color:"#b91c1c",pinned:true,date:"2026年6月27日",tag:"総会・理事会",
@@ -156,11 +154,6 @@ function buildPin(){
           var ok=(MODE==="member"&&entered==="2039")||(MODE==="admin"&&entered==="9999");
           if(ok){
             if(MODE==="member"){
-              var today=new Date().toLocaleDateString("ja-JP");
-              STATS.total=(STATS.total||0)+1;
-              if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
-              STATS.today=(STATS.today||0)+1;
-              try{localStorage.setItem("ks2",JSON.stringify(STATS));}catch(e){}
               READLOG_SELECTED=null;
               render("readlog");
             }else{
@@ -192,8 +185,14 @@ function buildReadLog(){
   var card=el("div",{style:"width:100%;max-width:400px;background:white;border-radius:18px;padding:28px 24px;box-shadow:0 4px 32px rgba(0,0,0,0.10);"});
   d.appendChild(card);
   card.innerHTML=
-    "<div style='font-size:18px;font-weight:bold;color:#1a3a6b;margin-bottom:6px;text-align:center;'>閲覧者確認</div>"+
-    "<div style='font-size:13px;color:#555;margin-bottom:18px;text-align:center;line-height:1.7;'>ご自身のお名前を選択し、内容確認のチェックを入れたうえで「閲覧する」を押してください。</div>";
+    "<div style='font-size:18px;font-weight:bold;color:#1a3a6b;margin-bottom:10px;text-align:center;'>閲覧者確認</div>"+
+    "<div style='font-size:13px;color:#333;margin-bottom:18px;line-height:1.9;background:#eef3fb;border-radius:10px;padding:12px 14px;'>"+
+    "以下の<strong>①②の両方</strong>を行うことで、初めて告知内容を閲覧できます。<br>"+
+    "<strong>①</strong>ご自身のお名前をクリックする<br>"+
+    "<strong>②</strong>「内容を確認しました」にチェックを入れる"+
+    "</div>";
+  var step1=el("div",{style:"font-size:13px;font-weight:bold;color:#1a3a6b;margin-bottom:8px;"},"① ご自身のお名前をクリックしてください");
+  card.appendChild(step1);
   var listWrap=el("div",{style:"display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"});
   READLOG_NAMES.forEach(function(name){
     var btn=el("button",{style:"text-align:left;padding:13px 14px;border-radius:10px;border:2px solid #dce4f0;background:#f9fafc;font-size:14px;color:#333;cursor:pointer;"},name);
@@ -207,6 +206,8 @@ function buildReadLog(){
     listWrap.appendChild(btn);
   });
   card.appendChild(listWrap);
+  var step2=el("div",{style:"font-size:13px;font-weight:bold;color:#1a3a6b;margin-bottom:8px;"},"② 内容確認のチェックを入れてください");
+  card.appendChild(step2);
   var chkRow=el("label",{style:"display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:13px;color:#333;cursor:pointer;"});
   var chk=el("input",{type:"checkbox",id:"readlog-chk",style:"width:20px;height:20px;flex-shrink:0;"});
   chkRow.appendChild(chk);
@@ -259,14 +260,6 @@ function buildBoard(){
     if(lb)lb.addEventListener("click",function(){render("top");});
   },50);
   var list=el("div",{style:"padding:14px;"});
-  if(STATS.total>0){
-    list.innerHTML+="<div style='background:white;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);'>"+
-      "<div style='font-size:14px;font-weight:bold;color:#1a3a6b;margin-bottom:10px;'>📊 組合員の関心バロメーター</div>"+
-      "<div style='display:flex;gap:10px;'>"+
-      "<div style='flex:1;background:#eef3fb;border-radius:8px;padding:10px;text-align:center;border:1px solid #1a3a6b;'><div style='font-size:11px;color:#1a3a6b;font-weight:bold;'>累計アクセス</div><div style='font-size:32px;font-weight:bold;color:#1a3a6b;'>"+STATS.total+"</div><div style='font-size:10px;color:#888;'>回</div></div>"+
-      "<div style='flex:1;background:#fff7e6;border-radius:8px;padding:10px;text-align:center;border:1px solid #d97706;'><div style='font-size:11px;color:#92400e;font-weight:bold;'>本日</div><div style='font-size:32px;font-weight:bold;color:#d97706;'>"+STATS.today+"</div><div style='font-size:10px;color:#888;'>回</div></div>"+
-      "</div></div>";
-  }
   NOTICES.slice().sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||b.id-a.id;}).forEach(function(n,idx){
     var card=el("div",{style:"background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border-left:5px solid "+n.color+";"});
     var body=el("div",{style:"padding:13px 15px;"});
