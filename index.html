@@ -190,6 +190,7 @@ function buildPin(){
 function buildReadLog(){
   var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;"});
   var card=el("div",{style:"width:100%;max-width:400px;background:white;border-radius:18px;padding:28px 24px;box-shadow:0 4px 32px rgba(0,0,0,0.10);"});
+  d.appendChild(card);
   card.innerHTML=
     "<div style='font-size:18px;font-weight:bold;color:#1a3a6b;margin-bottom:6px;text-align:center;'>閲覧者確認</div>"+
     "<div style='font-size:13px;color:#555;margin-bottom:18px;text-align:center;line-height:1.7;'>ご自身のお名前を選択し、内容確認のチェックを入れたうえで「閲覧する」を押してください。</div>";
