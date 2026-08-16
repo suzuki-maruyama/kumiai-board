@@ -12,9 +12,17 @@ body{background:#f4f7fb;font-family:sans-serif;min-height:100vh;}
 </head>
 <body>
 <div id="app"></div>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+<form id="readlog-form" action="https://docs.google.com/forms/d/e/1FAIpQLScFlE52vIxZU78jiORTZP4m_oGU0zYc4qbuv6XfB-uVqf6C0A/formResponse" method="POST" target="hidden_iframe" style="display:none;">
+<input type="hidden" name="entry.1864213602" id="rl-name">
+<input type="hidden" name="entry.1806811286" id="rl-confirm">
+<input type="hidden" name="entry.1681664341" id="rl-device">
+</form>
 <script src="data.js"></script>
 <script>
 var MODE="member", SELECTED=null, TAB="layer1";
+var READLOG_NAMES=["坪田勲","松尾圭子","小野文哉","木村望","境一彦","正村祐紀","管理会社フロント"];
+var READLOG_SELECTED=null;
 var STATS={total:0,today:0,lastDate:""};
 try{var _s=localStorage.getItem("ks2");if(_s)STATS=JSON.parse(_s);}catch(e){}
 
@@ -76,6 +84,7 @@ function render(screenId){
   app.innerHTML="";
   if(screenId==="top") app.appendChild(buildTop());
   else if(screenId==="pin") app.appendChild(buildPin());
+  else if(screenId==="readlog") app.appendChild(buildReadLog());
   else if(screenId==="board") app.appendChild(buildBoard());
   else if(screenId==="detail") app.appendChild(buildDetail());
   else if(screenId==="pdfview") app.appendChild(buildPdfView());
@@ -152,8 +161,11 @@ function buildPin(){
               if(STATS.lastDate!==today){STATS.today=0;STATS.lastDate=today;}
               STATS.today=(STATS.today||0)+1;
               try{localStorage.setItem("ks2",JSON.stringify(STATS));}catch(e){}
+              READLOG_SELECTED=null;
+              render("readlog");
+            }else{
+              render("board");
             }
-            render("board");
           }else{
             var err=document.getElementById("pin-err");
             if(err)err.style.display="block";
@@ -173,6 +185,63 @@ function buildPin(){
     var p0=document.getElementById("p0");if(p0)p0.focus();
   },100);
   return d;
+}
+
+function buildReadLog(){
+  var d=el("div",{style:"min-height:100vh;background:#f4f7fb;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;"});
+  var card=el("div",{style:"width:100%;max-width:400px;background:white;border-radius:18px;padding:28px 24px;box-shadow:0 4px 32px rgba(0,0,0,0.10);"});
+  card.innerHTML=
+    "<div style='font-size:18px;font-weight:bold;color:#1a3a6b;margin-bottom:6px;text-align:center;'>閲覧者確認</div>"+
+    "<div style='font-size:13px;color:#555;margin-bottom:18px;text-align:center;line-height:1.7;'>ご自身のお名前を選択し、内容確認のチェックを入れたうえで「閲覧する」を押してください。</div>";
+  var listWrap=el("div",{style:"display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"});
+  READLOG_NAMES.forEach(function(name){
+    var btn=el("button",{style:"text-align:left;padding:13px 14px;border-radius:10px;border:2px solid #dce4f0;background:#f9fafc;font-size:14px;color:#333;cursor:pointer;"},name);
+    btn.addEventListener("click",function(){
+      Array.prototype.forEach.call(listWrap.querySelectorAll("button"),function(b){
+        b.style.border="2px solid #dce4f0";b.style.background="#f9fafc";b.style.color="#333";b.style.fontWeight="normal";
+      });
+      this.style.border="2px solid #1a3a6b";this.style.background="#eef3fb";this.style.color="#1a3a6b";this.style.fontWeight="bold";
+      READLOG_SELECTED=name;
+    });
+    listWrap.appendChild(btn);
+  });
+  card.appendChild(listWrap);
+  var chkRow=el("label",{style:"display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:13px;color:#333;cursor:pointer;"});
+  var chk=el("input",{type:"checkbox",id:"readlog-chk",style:"width:20px;height:20px;flex-shrink:0;"});
+  chkRow.appendChild(chk);
+  chkRow.appendChild(document.createTextNode("内容を確認しました"));
+  card.appendChild(chkRow);
+  var errBox=el("div",{id:"readlog-err",style:"display:none;padding:10px;background:#fef2f2;border:2px solid #b91c1c;border-radius:8px;color:#b91c1c;font-size:13px;margin-bottom:12px;"},"お名前の選択と、確認しましたのチェックが必要です");
+  card.appendChild(errBox);
+  var goBtn=el("button",{style:"width:100%;background:#1a3a6b;color:white;font-size:16px;font-weight:bold;padding:16px;border:none;border-radius:12px;cursor:pointer;"},"閲覧する");
+  goBtn.addEventListener("click",function(){
+    var chkEl=document.getElementById("readlog-chk");
+    if(!READLOG_SELECTED||!chkEl||!chkEl.checked){
+      var e=document.getElementById("readlog-err");if(e)e.style.display="block";
+      return;
+    }
+    submitReadLog(READLOG_SELECTED);
+    render("board");
+  });
+  card.appendChild(goBtn);
+  return d;
+}
+
+function detectDevice(){
+  var ua=navigator.userAgent||"";
+  if(/iPhone|iPad|iPod|Android/i.test(ua))return "スマートフォン";
+  return "パソコン";
+}
+
+function submitReadLog(name){
+  try{
+    var f=document.getElementById("readlog-form");
+    if(!f)return;
+    document.getElementById("rl-name").value=name;
+    document.getElementById("rl-confirm").value="確認しました";
+    document.getElementById("rl-device").value=detectDevice();
+    f.submit();
+  }catch(e){}
 }
 
 function buildBoard(){
